@@ -60,6 +60,7 @@ public static class RealMouse {
     [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
     [DllImport("user32.dll")] public static extern void keybd_event(byte k, byte s, uint f, IntPtr e);
     // Premere e rilasciare ALT sblocca il cambio di finestra in primo piano da un altro processo
+    public static void Key(byte k) { keybd_event(k, 0, 0, IntPtr.Zero); System.Threading.Thread.Sleep(50); keybd_event(k, 0, 2, IntPtr.Zero); }
     public static void Front(IntPtr h) { keybd_event(0x12, 0, 0, IntPtr.Zero); keybd_event(0x12, 0, 2, IntPtr.Zero); SetForegroundWindow(h); }
     public static void Click(int x, int y) {
         SetCursorPos(x, y); System.Threading.Thread.Sleep(80);
@@ -93,7 +94,7 @@ function Step($name, [scriptblock]$body) {
     try { & $body } catch { Log "FAIL $name interrotto: $($_.Exception.Message)"; $script:fail++; Shot "errore" ; try { Close-Dialogs } catch {} }
 }
 function Close-Dialogs {
-    foreach ($id in 'DlgResultPrimary', 'DlgSkipLeftovers') {
+    foreach ($id in 'DlgSkipWait', 'DlgSkipLeftovers', 'DlgResultPrimary') {
         $b = Find-ById $script:win $id
         if (Visible $b) { Invoke $b; Start-Sleep -Seconds 1 }
     }
@@ -130,30 +131,45 @@ function Shot($name) {
     } catch { Log "screenshot non riuscito: $_" }
 }
 
-# Clicca i pulsanti delle procedure guidate degli altri programmi, come farebbe una persona
+# Porta avanti le procedure guidate degli altri programmi, come farebbe una persona:
+# solo finestre di processi nati dopo l'avvio del robot; prova a cliccare il pulsante giusto,
+# altrimenti porta la finestra davanti e preme Invio (il pulsante predefinito: OK / Avanti / Disinstalla / Fine).
 $wizardButtons = @('Uninstall', 'Disinstalla', '&Uninstall', 'Remove', 'Rimuovi', 'Yes', 'Sì', 'Si', 'OK', 'Next >', 'Next', 'Avanti >', 'Avanti',
                    'Finish', 'Fine', 'Close', 'Chiudi', 'Continue', 'Continua')
+$script:seenWindows = @{}
+$script:lastPoke = @{}
 function Drive-Wizards {
     $lindoPid = $script:proc.Id
     $windows = $AE::RootElement.FindAll($TS::Children, [System.Windows.Automation.Condition]::TrueCondition)
     foreach ($w in $windows) {
         try {
-            if ($w.Current.ProcessId -eq $lindoPid) { continue }
-            $pname = (Get-Process -Id $w.Current.ProcessId -ErrorAction SilentlyContinue).ProcessName
-            if ($pname -in @('explorer', 'pwsh', 'powershell', 'Runner.Worker', 'Runner.Listener', 'msedge', 'Greenshot', 'Everything', 'conhost', 'ShellExperienceHost', 'SearchHost', 'StartMenuExperienceHost', 'TextInputHost')) { continue }
-            # Opzioni "mantieni le impostazioni": le lasciamo come sono
+            $wpid = $w.Current.ProcessId
+            if ($wpid -eq $lindoPid -or $script:basePids.Contains($wpid)) { continue }
+            $pname = (Get-Process -Id $wpid -ErrorAction SilentlyContinue).ProcessName
+            if ($pname -in @('explorer', 'pwsh', 'powershell', 'conhost', 'ShellExperienceHost', 'SearchHost', 'StartMenuExperienceHost', 'TextInputHost', 'msedge', 'Greenshot', 'Everything')) { continue }
+            $key = "$wpid|$($w.Current.Name)"
+            if (-not $script:seenWindows.ContainsKey($key)) { $script:seenWindows[$key] = 1; Log "  finestra di un altro programma: '$($w.Current.Name)' ($pname)" }
+            if ($script:lastPoke.ContainsKey($key) -and ((Get-Date) - $script:lastPoke[$key]).TotalSeconds -lt 3) { continue }
+            $script:lastPoke[$key] = Get-Date
+            $done = $false
             foreach ($b in $wizardButtons) {
                 $btn = $w.FindFirst($TS::Descendants, (New-Object System.Windows.Automation.AndCondition (
                         (New-Object $PC ($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::Button)),
                         (New-Object $PC ($AE::NameProperty, $b)))))
                 if ($btn -and $btn.Current.IsEnabled -and -not $btn.Current.IsOffscreen) {
-                    Log "  procedura guidata di '$($w.Current.Name)' ($pname): clic su '$b'"
-                    Invoke $btn
-                    Start-Sleep -Milliseconds 800
+                    Log "  procedura guidata '$($w.Current.Name)': clic su '$b'"
+                    try { Invoke $btn; $done = $true } catch { Log "  clic non riuscito ($($_.Exception.Message)), provo con Invio" }
                     break
                 }
             }
-        } catch {}
+            if (-not $done) {
+                Log "  procedura guidata '$($w.Current.Name)': premo Invio"
+                [RealMouse]::Front([IntPtr]$w.Current.NativeWindowHandle)
+                Start-Sleep -Milliseconds 300
+                [RealMouse]::Key(0x0D)
+            }
+            Start-Sleep -Milliseconds 800
+        } catch { Log "  errore con una finestra: $($_.Exception.Message)" }
     }
 }
 
@@ -183,8 +199,16 @@ function Wait-Dialog-End([int]$seconds = 600) {
 function Uninstall-Flow($label) {
     Click (Find-ById $script:win 'DlgConfirmButton')
     Log "Conferma premuta ($label)"
-    $state = Wait-Dialog-End 900
+    $state = Wait-Dialog-End 600
     Log "Stato del dialogo: $state"
+    if ($state -eq 'timeout') {
+        # Come farebbe una persona stanca di aspettare: "Ho finito, cerca i residui"
+        Shot "$label-attesa-lunga"
+        Log "Il disinstallatore non ha finito: premo 'Ho finito, cerca i residui'"
+        Click (Find-ById $script:win 'DlgSkipWait')
+        $state = Wait-Dialog-End 300
+        Log "Stato del dialogo: $state"
+    }
     Shot "$label-dopo-disinstallatore"
     if ($state -eq 'residui') {
         Log ("Residui proposti: " + (Text-Of $script:win 'DlgLeftoversText'))
@@ -225,6 +249,8 @@ Log "App installate con cartella: $($before.Count)"
 # App di prova all'avvio
 Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'LindoProvaAvvio' -Value '"C:\Windows\System32\notepad.exe" /nonesiste'
 
+$script:basePids = New-Object 'System.Collections.Generic.HashSet[int]'
+foreach ($p in Get-Process) { [void]$script:basePids.Add($p.Id) }
 $script:proc = Start-Process $Lindo -PassThru
 $script:win = Wait-For {
     $AE::RootElement.FindFirst($TS::Children, (New-Object System.Windows.Automation.AndCondition (

@@ -1097,7 +1097,7 @@
                         <Grid Grid.Row="2" Margin="0,18,0,0">
                             <CheckBox x:Name="DlgSelectAll" Content="Seleziona tutto" Foreground="{StaticResource Subtle}" Checked="OnDlgSelectAll" Unchecked="OnDlgSelectAll" VerticalAlignment="Center"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button Style="{StaticResource GhostButton}" Content="Salta" Click="OnSkipLeftovers" Margin="0,0,10,0"/>
+                                <Button x:Name="DlgSkipLeftovers" Style="{StaticResource GhostButton}" Content="Salta" Click="OnSkipLeftovers" Margin="0,0,10,0"/>
                                 <Button x:Name="DlgDeleteButton" AutomationProperties.Name="Elimina selezionati" Style="{StaticResource DangerButton}" Click="OnDeleteLeftovers" Padding="22,10">
                                     <TextBlock x:Name="DlgDeleteText" Text="Elimina selezionati"/>
                                 </Button>
