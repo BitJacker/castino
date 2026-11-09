@@ -141,7 +141,7 @@ namespace Lindo
         /// </summary>
         public static int UninstallTest(string output, string[] names, string[] mustSurvive)
         {
-            var sb = new StringBuilder();
+            var sb = new LiveReport(output);
             int failures = 0;
             void Check(bool ok, string what) { sb.AppendLine((ok ? "PASS " : "FAIL ") + what); if (!ok) failures++; }
             try
@@ -193,11 +193,21 @@ namespace Lindo
             }
             catch (Exception ex) { sb.AppendLine("FAIL eccezione: " + ex); failures++; }
             sb.AppendLine(failures == 0 ? "RISULTATO: OK" : "RISULTATO: " + failures + " errori");
-            Write(output, sb);
             return failures == 0 ? 0 : 1;
         }
 
-        private static bool RunSilentUninstall(AppInfo a, StringBuilder sb)
+        /// <summary>Rapporto che viene scritto su disco a ogni riga (si vede anche se il test si blocca).</summary>
+        private sealed class LiveReport
+        {
+            private readonly string _path;
+            public LiveReport(string path) { _path = path; try { File.WriteAllText(path, ""); } catch { } }
+            public void AppendLine(string line)
+            {
+                try { File.AppendAllText(_path, DateTime.Now.ToString("HH:mm:ss ") + line + Environment.NewLine, Encoding.UTF8); } catch { }
+            }
+        }
+
+        private static bool RunSilentUninstall(AppInfo a, LiveReport sb)
         {
             string file, args;
             if (!string.IsNullOrWhiteSpace(a.QuietUninstallString))
@@ -219,7 +229,11 @@ namespace Lindo
                 var started = DateTime.Now;
                 using (var p = Process.Start(new ProcessStartInfo(file, args) { UseShellExecute = true }))
                 {
-                    p.WaitForExit(300000);
+                    if (p != null && !p.WaitForExit(180000))
+                    {
+                        sb.AppendLine("    il disinstallatore non ha finito in 3 minuti: lo chiudo");
+                        try { p.Kill(); } catch { }
+                    }
                 }
                 // I disinstallatori NSIS/Inno si copiano in %TEMP% e continuano: aspettiamo che finiscano
                 for (int i = 0; i < 120; i++)
@@ -234,8 +248,10 @@ namespace Lindo
                         catch { return false; }
                     }).ToList();
                     if (helpers.Count == 0) break;
+                    if (i == 119) { sb.AppendLine("    processi di disinstallazione ancora aperti: li chiudo"); foreach (var h in helpers) { try { h.Kill(); } catch { } } }
                     Thread.Sleep(1000);
                 }
+                sb.AppendLine("    disinstallatore terminato dopo " + (int)(DateTime.Now - started).TotalSeconds + " s");
                 return true;
             }
             catch (Exception ex)

@@ -9,8 +9,11 @@ namespace Lindo
 {
     public partial class App : Application
     {
+        private bool _headless;
+
         protected override void OnStartup(StartupEventArgs e)
         {
+            _headless = (e.Args ?? new string[0]).Any(a => a.StartsWith("--selftest") || a.StartsWith("--safety-test") || a.StartsWith("--test-uninstall"));
             base.OnStartup(e);
             DispatcherUnhandledException += OnUiException;
             AppDomain.CurrentDomain.UnhandledException += (s, a) => Log.Write("Errore fatale: " + a.ExceptionObject);
@@ -54,6 +57,8 @@ namespace Lindo
         private void OnUiException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             Log.Write("Errore interfaccia: " + e.Exception);
+            e.Handled = true;
+            if (_headless) return; // nei test automatici nessuna finestra deve bloccare
             MessageBox.Show("Si è verificato un errore imprevisto:\n\n" + e.Exception.Message +
                             "\n\nDettagli nel file:\n" + Log.FilePath, "Lindo", MessageBoxButton.OK, MessageBoxImage.Warning);
             e.Handled = true;

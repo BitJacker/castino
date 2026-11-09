@@ -137,9 +137,11 @@ jobs:
 
       - name: Disinstallazione vera di 6 app (le altre devono restare intatte)
         shell: pwsh
+        timeout-minutes: 30
         run: |
           $survive = "$env:NPM_PREFIX;$env:APPDATA\npm;$env:LOCALAPPDATA\npm-cache;$env:APPDATA\Claude;$env:USERPROFILE\.claude;$env:LOCALAPPDATA\AnthropicClaude;$env:ProgramFiles\Git"
-          $p = Start-Process "$env:ProgramFiles\Lindo\Lindo.exe" -ArgumentList "--test-uninstall `"$pwd\uninstall.txt`" --apps `"7-Zip;VLC;Notepad++;PuTTY;WinSCP;KeePass`" --must-survive `"$survive`"" -Wait -PassThru
+          $p = Start-Process "$env:ProgramFiles\Lindo\Lindo.exe" -ArgumentList "--test-uninstall `"$pwd\uninstall.txt`" --apps `"7-Zip;VLC;Notepad++;PuTTY;WinSCP;KeePass`" --must-survive `"$survive`"" -PassThru
+          if (-not $p.WaitForExit(1500000)) { Get-Content uninstall.txt; Get-Process | Sort-Object StartTime -ErrorAction SilentlyContinue | Select-Object -Last 15 Name,Id,StartTime; throw "Test bloccato" }
           Get-Content uninstall.txt
           if ($p.ExitCode -ne 0) { throw "Test di disinstallazione fallito" }
           # Gli strumenti devono funzionare ancora
@@ -168,7 +170,7 @@ jobs:
             docs/screenshots/*.png
 
       - name: Salva le schermate nel repository
-        if: github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')
+        if: always() && github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
