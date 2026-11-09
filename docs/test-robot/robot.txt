@@ -1,17 +1,62 @@
 
-20:30:01 App installate con cartella: 34
-20:30:02 PASS Lindo si apre
-20:30:09 Riepilogo: 76 programmi, 2 app dello Store e 12 driver · scegli cosa togliere e Lindo pulisce anche i residui
-20:30:11 PASS Trovo il pulsante Disinstalla di VLC
-20:30:15 Conferma premuta (vlc)
-20:30:19 Stato del dialogo: risultato
-20:30:19 Risultato mostrato da Lindo: La disinstallazione non è stata completata
-20:30:22 FAIL VLC non è più tra le app installate
-20:30:22 FAIL Cartella di VLC eliminata
-20:30:22 PASS Impostazioni di VLC in AppData eliminate
-20:30:22 FAIL Collegamenti di VLC nel menu Start eliminati
-20:30:29 Selezionata: Seleziona 7-Zip 26.06 (x64)
-20:30:31 Selezionata: Seleziona Notepad++ (64-bit x64)
-20:30:33 PASS Selezionate 2 app con le caselle
-20:35:40 TIMEOUT: analisi residui
-20:35:44 Selezione: 0 di 8 selezionati · 0 B su 783 KB
+20:35:52 App installate con cartella: 34
+20:35:53 PASS Lindo si apre
+20:35:58 Riepilogo: 76 programmi, 2 app dello Store e 12 driver · scegli cosa togliere e Lindo pulisce anche i residui
+20:35:58 ---- 1. Disinstallo VLC dal suo pulsante
+20:36:00 PASS Trovo il pulsante Disinstalla di VLC
+20:36:04 Conferma premuta (vlc)
+20:51:05 Stato del dialogo: timeout
+20:51:05 Risultato mostrato da Lindo: 
+20:51:05 FAIL 1. Disinstallo VLC dal suo pulsante interrotto: Elemento non trovato
+20:51:05 ---- 2. Disinstallo 7-Zip e Notepad++ insieme
+20:51:09 FAIL 2. Disinstallo 7-Zip e Notepad++ insieme interrotto: La casella 'Seleziona 7-Zip 26.06 (x64)' non si è attivata
+20:51:10 ---- 3. Residui e verifica
+20:51:12 FAIL 3. Residui e verifica interrotto: Elemento non trovato
+20:51:12 ---- 4. Ottimizza e Ripristina
+20:52:13 TIMEOUT: analisi ottimizzazioni
+20:52:13 FAIL 4. Ottimizza e Ripristina interrotto: Elemento non trovato
+20:52:14 ---- 5. App all'avvio
+20:54:15 TIMEOUT: app di prova all'avvio
+20:54:15 FAIL L'app di prova compare tra le app all'avvio
+20:54:15 ---- 6. Errori e crash
+20:54:31 FAIL Il crash provocato compare e viene spiegato
+20:54:34 PASS Ancora intatta: Audacity 3.7.9
+20:54:34 PASS Ancora intatta: AutoHotkey
+20:54:34 PASS Ancora intatta: CPUID CPU-Z 3.02
+20:54:34 PASS Ancora intatta: Everything 1.4.1.1032 (x64)
+20:54:34 PASS Ancora intatta: Git
+20:54:34 PASS Ancora intatta: HWiNFO® 64
+20:54:34 PASS Ancora intatta: ImageMagick 7.1.2-25 Q16-HDRI (64-bit) (2026-06-04)
+20:54:34 PASS Ancora intatta: IrfanView 4.76 (64-bit)
+20:54:34 PASS Ancora intatta: Mozilla Firefox (x64 en-US)
+20:54:34 PASS Ancora intatta: OpenSSL 3.6.5 (64-bit)
+20:54:34 PASS Ancora intatta: PostgreSQL 17 
+20:54:34 PASS Ancora intatta: R for Windows 4.6.2
+20:54:34 PASS Ancora intatta: Rtools 4.5 (6768-6492)
+20:54:34 PASS Ancora intatta: Microsoft Azure Service Fabric
+20:54:34 PASS Ancora intatta: SumatraPDF
+20:54:34 PASS Ancora intatta: Strawberry Perl (64-bit)
+20:54:34 PASS Ancora intatta: CMake
+20:54:34 PASS Ancora intatta: MySQL Server 8.4
+20:54:34 PASS Ancora intatta: WinDirStat 2.9.3
+20:54:34 PASS Ancora intatta: PeaZip 11.4.0 (WIN64)
+20:54:34 PASS Ancora intatta: Workflow Manager Client 1.0
+20:54:34 PASS Ancora intatta: Microsoft Visual Studio Installer
+20:54:34 PASS Ancora intatta: MongoDB Shell
+20:54:34 PASS Ancora intatta: Azure Cosmos DB Emulator
+20:54:34 PASS Ancora intatta: Workflow Manager Tools 1.0 for Visual Studio
+20:54:34 PASS Ancora intatta: Visual Studio Enterprise 2026
+20:54:34 PASS Ancora intatta: FileZilla 3.71.1
+20:54:34 PASS Ancora intatta: Inno Setup version 6.7.1
+20:54:34 PASS Ancora intatta: KeePass Password Safe 2.62
+20:54:34 PASS Ancora intatta: Microsoft Edge WebView2 Runtime
+20:54:34 PASS Ancora intatta: WinSCP 6.7
+20:54:34 PASS Ancora intatta: Greenshot 1.3.328
+20:54:34 PASS Ancora presente: C:\npm\prefix
+20:54:34 PASS Ancora presente: C:\Users\runneradmin\AppData\Roaming\npm
+20:54:34 PASS Ancora presente: C:\Users\runneradmin\AppData\Local\npm-cache
+20:54:34 PASS Ancora presente: C:\Users\runneradmin\AppData\Roaming\Claude
+20:54:34 PASS Ancora presente: C:\Users\runneradmin\.claude
+20:54:34 PASS Ancora presente: C:\Users\runneradmin\AppData\Local\AnthropicClaude
+20:54:34 PASS Ancora presente: C:\Program Files\Git
+20:54:34 RISULTATO: 6 errori
