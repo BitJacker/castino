@@ -197,10 +197,10 @@ namespace Lindo
             RefreshResourcesButton.IsEnabled = false;
             try
             {
-                var snapTask = Task.Run(() => ResourceService.Measure());
-                var gpuTask = _gpu == null ? Task.Run(() => ResourceService.ReadGpu()) : Task.FromResult(_gpu);
-                var snap = await snapTask;
-                _gpu = await gpuTask;
+                // Prima la scheda video (avvia PowerShell), poi la misura: così Lindo non "sporca" i numeri con il proprio lavoro
+                if (_gpu == null) { _gpu = await Task.Run(() => ResourceService.ReadGpu()); ShowGpu(); }
+                await Task.Delay(400);
+                var snap = await Task.Run(() => ResourceService.Measure());
 
                 CpuValue.Text = Math.Round(snap.CpuPercent) + "%";
                 CpuBar.Value = snap.CpuPercent;
@@ -226,7 +226,9 @@ namespace Lindo
         private void ShowGpu()
         {
             if (_gpu == null) return;
-            GpuNames.Text = _gpu.Names.Count == 0 ? "Scheda video non riconosciuta" : string.Join("\n", _gpu.Names);
+            GpuNames.Text = _gpu.Names.Count > 0 ? string.Join("\n", _gpu.Names)
+                : _gpu.AllNames.Count > 0 ? _gpu.AllNames[0] + " (scheda virtuale)"
+                : "Scheda video non riconosciuta";
             GpuScheduling.Text = _gpu.HardwareScheduling == true
                 ? "Pianificazione GPU con accelerazione hardware: attiva"
                 : _gpu.HardwareScheduling == false

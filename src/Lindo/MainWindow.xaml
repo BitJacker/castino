@@ -758,12 +758,16 @@
                         </LinearGradientBrush>
                     </Border.Background>
                     <Grid>
-                        <StackPanel>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,16,0">
                             <TextBlock Text="Stato del PC" Foreground="{StaticResource Subtle}"/>
-                            <TextBlock x:Name="OptimizeScore" Text="Analisi…" FontFamily="{StaticResource DisplayFont}" FontSize="32" FontWeight="Bold" Margin="0,2,0,0"/>
-                            <TextBlock x:Name="OptimizeStatus" Text="" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
+                            <TextBlock x:Name="OptimizeScore" Text="Analisi…" FontFamily="{StaticResource DisplayFont}" FontSize="30" FontWeight="Bold" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="OptimizeStatus" Text="" Foreground="{StaticResource Subtle}" FontSize="12.5" TextWrapping="Wrap"/>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                             <Button x:Name="RestoreButton" Style="{StaticResource GhostButton}" Content="Ripristina tutto" Margin="0,0,10,0" Click="OnOptimizeRestore"/>
                             <Button x:Name="OptimizeButton" AutomationProperties.Name="Ottimizza ora" Style="{StaticResource PrimaryButton}" Padding="26,13" FontSize="15" Click="OnOptimizeClick">
                                 <StackPanel Orientation="Horizontal">
@@ -818,7 +822,7 @@
                                 <Button x:Name="RefreshResourcesButton" DockPanel.Dock="Right" Style="{StaticResource GhostButton}" Padding="10,4" FontSize="12"
                                         Content="Aggiorna" Click="OnRefreshResources" AutomationProperties.Name="Aggiorna risorse"/>
                                 <TextBlock Text="&#xE7F4;" Style="{StaticResource Glyph}" Foreground="#A99BFF" Margin="0,0,8,0"/>
-                                <TextBlock Text="Scheda video (GPU)" Foreground="{StaticResource Subtle}" VerticalAlignment="Center"/>
+                                <TextBlock Text="Scheda video" Foreground="{StaticResource Subtle}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                             </DockPanel>
                             <TextBlock x:Name="GpuNames" Text="…" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,8,0,2"/>
                             <TextBlock x:Name="GpuScheduling" Text="" FontSize="12" Foreground="{StaticResource Subtle}" TextWrapping="Wrap"/>

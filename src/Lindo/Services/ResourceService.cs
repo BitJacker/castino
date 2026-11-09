@@ -23,6 +23,8 @@ namespace Lindo.Services
     internal sealed class GpuInfo
     {
         public List<string> Names { get; set; } = new List<string>();
+        /// <summary>Tutti gli adattatori, compresi quelli virtuali (per dire almeno cosa c'è).</summary>
+        public List<string> AllNames { get; set; } = new List<string>();
         /// <summary>true = attiva, false = non attiva, null = impostazione non presente (scheda o driver non compatibili).</summary>
         public bool? HardwareScheduling { get; set; }
         public bool HasTwoGpus => Names.Count >= 2;
@@ -83,11 +85,14 @@ namespace Lindo.Services
             snap.CpuPercent = ResourceMath.CpuPercent(i1.Value, k1.Value, u1.Value, i2.Value, k2.Value, u2.Value);
 
             var usages = new List<ProcessUsage>();
+            int selfId;
+            using (var self = Process.GetCurrentProcess()) selfId = self.Id;
             foreach (var p in Process.GetProcesses())
             {
                 try
                 {
                     if (ResourceMath.IsSystemIdle(p.ProcessName)) continue;
+                    if (p.Id == selfId) continue; // Lindo stesso sta misurando
                     double cpu = 0;
                     try
                     {
@@ -115,7 +120,9 @@ namespace Lindo.Services
             var output = PowerShell.Run(
                 "[Console]::OutputEncoding=[Text.Encoding]::UTF8;" +
                 "Get-CimInstance Win32_VideoController | ForEach-Object { $_.Name }", TimeSpan.FromSeconds(30));
-            info.Names = ResourceMath.RealGpus((output ?? "").Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+            var all = (output ?? "").Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(x => x.Length > 0).Distinct().ToList();
+            info.AllNames = all;
+            info.Names = ResourceMath.RealGpus(all);
             try
             {
                 using (var k = SystemInfo.OpenKey(@"HKLM\" + GraphicsDriversKey))

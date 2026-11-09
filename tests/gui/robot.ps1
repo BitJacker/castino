@@ -73,6 +73,7 @@ public static class RealMouse {
 # Clic vero col mouse, come una persona: porta Lindo davanti, scorre fino all'elemento e ci clicca sopra
 function Click($el) {
     if ($el -eq $null) { throw "Elemento non trovato" }
+    try { Close-Strays } catch {}
     if (-not $el.Current.IsEnabled) { throw "Elemento disattivato: $($el.Current.Name)" }
     $p = $null
     if ($el.TryGetCurrentPattern([System.Windows.Automation.ScrollItemPattern]::Pattern, [ref]$p)) { try { $p.ScrollIntoView(); Start-Sleep -Milliseconds 300 } catch {} }
@@ -91,6 +92,7 @@ function Click($el) {
 # Prova un passo; se qualcosa va storto lo segna come errore e continua con il passo dopo
 function Step($name, [scriptblock]$body) {
     Log "---- $name"
+    try { Close-Strays } catch {}
     try { & $body } catch { Log "FAIL $name interrotto: $($_.Exception.Message)"; $script:fail++; Shot "errore" ; try { Close-Dialogs } catch {} }
 }
 function Close-Dialogs {
@@ -170,6 +172,16 @@ function Drive-Wizards {
             }
             Start-Sleep -Milliseconds 800
         } catch { Log "  errore con una finestra: $($_.Exception.Message)" }
+    }
+}
+
+# Alcuni disinstallatori aprono il browser alla fine (pagina "perché disinstalli?"): una persona lo chiude
+function Close-Strays {
+    foreach ($p in Get-Process msedge, chrome, firefox -ErrorAction SilentlyContinue) {
+        if (-not $script:basePids.Contains($p.Id)) {
+            if (-not $script:strayLogged) { Log "  chiudo il browser aperto da un disinstallatore"; $script:strayLogged = $true }
+            Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+        }
     }
 }
 
@@ -321,7 +333,7 @@ Step '3. Residui e verifica' {
 Click (Find-ById $script:win 'NavLeftovers')
 Start-Sleep -Seconds 1
 Click (Find-ById $script:win 'ScanOrphansButton')
-Wait-For { Visible (Find-ById $script:win 'OrphansActionBar') -or (Visible (Find-ById $script:win 'OrphansClean')) } 300 'analisi residui' | Out-Null
+Wait-For { ((Text-Of $script:win 'OrphansSelection') -like '*selezionati*') -or (Visible (Find-ById $script:win 'OrphansClean')) } 300 'analisi residui' | Out-Null
 Start-Sleep -Seconds 2
 Shot 'residui'
 $selAll = Find-ById $script:win 'OrphansSelectAll'
