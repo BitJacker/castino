@@ -27,7 +27,7 @@ jobs:
       - name: Versione
         id: ver
         run: |
-          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"; else echo "version=1.1.0" >> "$GITHUB_OUTPUT"; fi
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"; else echo "version=1.1.1" >> "$GITHUB_OUTPUT"; fi
 
       - name: Test + build
         env:

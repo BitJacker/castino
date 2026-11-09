@@ -9,7 +9,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\assets\lindo.ico</ApplicationIcon>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Product>Lindo</Product>
     <Description>Lindo Monitor - registra quali app usi e quanto consumano</Description>
     <DebugType>embedded</DebugType>

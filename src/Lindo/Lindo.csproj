@@ -12,8 +12,8 @@
     <Prefer32Bit>false</Prefer32Bit>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\assets\lindo.ico</ApplicationIcon>
-    <Version>1.1.0</Version>
-    <FileVersion>1.1.0.0</FileVersion>
+    <Version>1.1.1</Version>
+    <FileVersion>1.1.1.0</FileVersion>
     <Product>Lindo</Product>
     <Company>Lindo</Company>
     <Description>Lindo - disinstalla le app senza lasciare residui</Description>

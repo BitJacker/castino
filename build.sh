@@ -3,7 +3,7 @@
 # Requisiti: .NET SDK 8 (Microsoft, con il supporto WindowsDesktop) e wixl (pacchetto "wixl" / msitools).
 set -euo pipefail
 cd "$(dirname "$0")"
-VERSION="${VERSION:-1.1.0}"
+VERSION="${VERSION:-1.1.1}"
 
 dotnet test tests/Lindo.Core.Tests -c Release
 dotnet build src/Lindo -c Release -p:Version="$VERSION"

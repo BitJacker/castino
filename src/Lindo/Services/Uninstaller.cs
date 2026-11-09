@@ -104,7 +104,9 @@ namespace Lindo.Services
                     if (FindHelperProcesses(before, started, uninstallerDir).Count > 0) continue;
                     break;
                 }
-                if (!mainAlive && !IsStillInstalled(app)) break;
+                // Alcuni disinstallatori (es. Notepad++) tolgono la voce dall'elenco e POI fanno ancora domande:
+                // si considera finito solo se nessun loro processo ha più una finestra aperta.
+                if (!mainAlive && !IsStillInstalled(app) && !children.Any(HasWindow)) break;
             }
 
             if (skip.IsCancellationRequested) return UninstallOutcome.Skipped;
@@ -125,6 +127,11 @@ namespace Lindo.Services
                 return n > 0 && n < sb.Capacity ? sb.ToString() : path;
             }
             catch { return path; }
+        }
+
+        private static bool HasWindow(Process p)
+        {
+            try { p.Refresh(); return !p.HasExited && p.MainWindowHandle != IntPtr.Zero; } catch { return false; }
         }
 
         private static string SafeDir(string file)

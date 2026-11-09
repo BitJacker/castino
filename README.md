@@ -127,8 +127,8 @@ Ogni eliminazione passa da più controlli, scritti in modo prudente e verificati
 
 ### ⬇️ Download
 
-- **[Lindo-1.1.0.msi](../../raw/HEAD/download/Lindo-1.1.0.msi)**: installer (consigliato)
-- **[Lindo-1.1.0-portatile.zip](../../raw/HEAD/download/Lindo-1.1.0-portatile.zip)**: versione portatile (Lindo + monitor)
+- **[Lindo-1.1.1.msi](../../raw/HEAD/download/Lindo-1.1.1.msi)**: installer (consigliato)
+- **[Lindo-1.1.1-portatile.zip](../../raw/HEAD/download/Lindo-1.1.1-portatile.zip)**: versione portatile (Lindo + monitor)
 - **[Lindo.exe](../../raw/HEAD/download/Lindo.exe)**: solo l'app, senza monitor in background
 
 Gli stessi file sono anche nella pagina [Releases](../../releases/latest).
