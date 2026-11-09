@@ -1,0 +1,17 @@
+
+20:30:01 App installate con cartella: 34
+20:30:02 PASS Lindo si apre
+20:30:09 Riepilogo: 76 programmi, 2 app dello Store e 12 driver · scegli cosa togliere e Lindo pulisce anche i residui
+20:30:11 PASS Trovo il pulsante Disinstalla di VLC
+20:30:15 Conferma premuta (vlc)
+20:30:19 Stato del dialogo: risultato
+20:30:19 Risultato mostrato da Lindo: La disinstallazione non è stata completata
+20:30:22 FAIL VLC non è più tra le app installate
+20:30:22 FAIL Cartella di VLC eliminata
+20:30:22 PASS Impostazioni di VLC in AppData eliminate
+20:30:22 FAIL Collegamenti di VLC nel menu Start eliminati
+20:30:29 Selezionata: Seleziona 7-Zip 26.06 (x64)
+20:30:31 Selezionata: Seleziona Notepad++ (64-bit x64)
+20:30:33 PASS Selezionate 2 app con le caselle
+20:35:40 TIMEOUT: analisi residui
+20:35:44 Selezione: 0 di 8 selezionati · 0 B su 783 KB
