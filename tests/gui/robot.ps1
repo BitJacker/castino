@@ -315,7 +315,14 @@ Check ($sel -eq 2) "Selezionate 2 app con le caselle"
 Shot 'selezione-multipla'
 $multi = Find-ById $script:win 'UninstallSelectedButton'
 if ($multi) {
-    Click $multi
+    # Il browser aperto in ritardo dal disinstallatore di VLC può coprire Lindo: se il clic non apre la conferma, lo chiudo e riprovo
+    for ($try = 1; $try -le 3; $try++) {
+        Click $multi
+        if (Wait-For { Visible (Find-ById $script:win 'DlgConfirmButton') } 8 'conferma disinstallazione multipla') { break }
+        Log "  la conferma non è comparsa (tentativo $try): chiudo eventuali finestre davanti e riprovo"
+        Start-Sleep -Seconds 3
+        Close-Strays
+    }
     Start-Sleep -Seconds 1
     Shot 'multi-conferma'
     Uninstall-Flow 'multi' | Out-Null

@@ -140,6 +140,7 @@ jobs:
         timeout-minutes: 40
         run: |
           $survive = "$env:NPM_PREFIX;$env:APPDATA\npm;$env:LOCALAPPDATA\npm-cache;$env:APPDATA\Claude;$env:USERPROFILE\.claude;$env:LOCALAPPDATA\AnthropicClaude;$env:ProgramFiles\Git"
+          Remove-Item -Recurse -Force docs\test-robot -ErrorAction SilentlyContinue
           & .\tests\gui\robot.ps1 -Out "$PWD\docs\test-robot" -ExpectOrphans $env:EXPECT -MustSurvive $survive
           $code = $LASTEXITCODE
           node --version; npm --version; git --version; python --version
@@ -174,7 +175,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/screenshots/*.png docs/test-robot
+          git add -A docs/screenshots docs/test-robot
           if git diff --cached --quiet; then echo "Nessuna schermata nuova"; exit 0; fi
           git commit -m "Aggiorna le schermate del README [skip ci]"
           # Se nel frattempo è arrivato un altro commit, le schermate di questo giro hanno la precedenza

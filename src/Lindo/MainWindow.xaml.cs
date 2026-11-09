@@ -93,8 +93,44 @@ namespace Lindo
 
         // ================================================================== finestra
 
+        // Con WindowStyle=None una finestra ingrandita coprirebbe anche la barra delle applicazioni:
+        // rispondendo a WM_GETMINMAXINFO le diciamo di occupare solo l'area di lavoro del monitor.
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct POINT { public int X, Y; }
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct MINMAXINFO { public POINT Reserved, MaxSize, MaxPosition, MinTrackSize, MaxTrackSize; }
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct RECT { public int Left, Top, Right, Bottom; }
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct MONITORINFO { public int Size; public RECT Monitor, Work; public uint Flags; }
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint flags);
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool GetMonitorInfo(IntPtr monitor, ref MONITORINFO info);
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            const int WM_GETMINMAXINFO = 0x0024;
+            if (msg != WM_GETMINMAXINFO) return IntPtr.Zero;
+            try
+            {
+                var monitor = MonitorFromWindow(hwnd, 2 /* MONITOR_DEFAULTTONEAREST */);
+                var info = new MONITORINFO { Size = System.Runtime.InteropServices.Marshal.SizeOf(typeof(MONITORINFO)) };
+                if (monitor == IntPtr.Zero || !GetMonitorInfo(monitor, ref info)) return IntPtr.Zero;
+                var mmi = (MINMAXINFO)System.Runtime.InteropServices.Marshal.PtrToStructure(lParam, typeof(MINMAXINFO));
+                mmi.MaxPosition.X = info.Work.Left - info.Monitor.Left;
+                mmi.MaxPosition.Y = info.Work.Top - info.Monitor.Top;
+                mmi.MaxSize.X = info.Work.Right - info.Work.Left;
+                mmi.MaxSize.Y = info.Work.Bottom - info.Work.Top;
+                System.Runtime.InteropServices.Marshal.StructureToPtr(mmi, lParam, true);
+            }
+            catch { }
+            return IntPtr.Zero;
+        }
+
         private void ApplyWindowEffects()
         {
+            try { HwndSource.FromHwnd(new WindowInteropHelper(this).Handle)?.AddHook(WndProc); } catch { }
             try
             {
                 var hwnd = new WindowInteropHelper(this).Handle;
@@ -108,7 +144,7 @@ namespace Lindo
 
         private void OnWindowStateChanged()
         {
-            Root.Margin = WindowState == WindowState.Maximized ? new Thickness(7) : new Thickness(0);
+            Root.Margin = new Thickness(0); // l'area di lavoro la decide WndProc (WM_GETMINMAXINFO)
             MaxButton.Content = WindowState == WindowState.Maximized ? "" : "";
         }
 
