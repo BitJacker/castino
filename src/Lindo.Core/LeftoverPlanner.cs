@@ -279,9 +279,10 @@ namespace Lindo.Core
 
         /// <summary>
         /// Cartelle di primo livello che non sembrano appartenere a nessuna app installata.
-        /// Sono solo "sospette": l'utente deve confermarle una per una.
+        /// Con <paramref name="evidence"/> vengono divise in "sicure" (Confidence.High) e "da controllare" (Low):
+        /// una cartella è sicura solo se nessun indizio dice che è ancora usata.
         /// </summary>
-        public List<Leftover> FindOrphans(IEnumerable<AppInfo> allApps)
+        public List<Leftover> FindOrphans(IEnumerable<AppInfo> allApps, OrphanEvidence evidence = null)
         {
             var apps = (allApps ?? Enumerable.Empty<AppInfo>()).ToList();
             var publisherKeys = new HashSet<string>(apps.Select(a => NameMatcher.PublisherKey(a.Publisher)).Where(k => k.Length >= 2));
@@ -299,17 +300,42 @@ namespace Lindo.Core
                     if (name.StartsWith("Microsoft", StringComparison.OrdinalIgnoreCase) ||
                         name.StartsWith("Windows", StringComparison.OrdinalIgnoreCase)) continue;
                     if (name.StartsWith(".", StringComparison.Ordinal) || name.StartsWith("{", StringComparison.Ordinal)) continue;
+                    if (name.StartsWith("$", StringComparison.Ordinal)) continue;
                     if (LooksLikeId(name)) continue;
                     if (!_guard.CanDelete(dir)) continue;
                     if (IsOwnedByAny(dir, name, apps, publisherKeys)) continue;
+                    if (KnownTools.IsKnownTool(name)) continue;
 
-                    result.Add(new Leftover
+                    var item = new Leftover
                     {
                         Kind = LeftoverKind.Folder,
                         Path = WinPath.Normalize(dir),
                         Confidence = Confidence.Low,
                         Reason = "Nessun programma installato usa questa cartella",
-                    });
+                    };
+
+                    if (evidence != null)
+                    {
+                        // Indizi forti di utilizzo: la cartella non viene proposta per niente
+                        var used = evidence.InUsePaths.FirstOrDefault(p => WinPath.IsSameOrInside(p.Path, dir));
+                        if (used != null) continue;
+
+                        var newest = evidence.NewestActivity?.Invoke(dir);
+                        item.LastModified = newest;
+                        if (newest.HasValue && evidence.Now - newest.Value < TimeSpan.FromDays(evidence.RecentDays))
+                        {
+                            item.Confidence = Confidence.Low;
+                            item.Reason = "Usata di recente (" + TimeText.Ago(newest.Value, evidence.Now) + "): forse serve ancora";
+                        }
+                        else
+                        {
+                            item.Confidence = Confidence.High;
+                            item.Reason = newest.HasValue
+                                ? "Nessun programma la usa, ferma da " + TimeText.Ago(newest.Value, evidence.Now).Replace(" fa", "")
+                                : "Nessun programma la usa";
+                        }
+                    }
+                    result.Add(item);
                 }
             }
             return result;

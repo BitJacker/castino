@@ -7,6 +7,7 @@ namespace Lindo.Core
     {
         Desktop,
         Store,
+        Driver,
     }
 
     /// <summary>Descrizione "pura" di un'app installata (indipendente dall'interfaccia).</summary>
@@ -36,6 +37,15 @@ namespace Lindo.Core
         public string PackageFullName { get; set; } = string.Empty;
         public string PackageFamilyName { get; set; } = string.Empty;
 
+        /// <summary>Per i driver: nome pubblicato (oemNN.inf), classe e dispositivi che lo usano.</summary>
+        public string DriverInf { get; set; } = string.Empty;
+        public string DriverClass { get; set; } = string.Empty;
+        public string DriverInUseBy { get; set; } = string.Empty;
+        public bool DriverIsCritical { get; set; }
+
+        /// <summary>Ultimo utilizzo noto (Prefetch, UserAssist, monitor di Lindo). Null = nessun dato.</summary>
+        public DateTime? LastUsed { get; set; }
+
         public string InstallFolderName =>
             string.IsNullOrWhiteSpace(InstallLocation) ? string.Empty : WinPath.GetFileName(InstallLocation);
 
@@ -48,6 +58,7 @@ namespace Lindo.Core
         File,
         Shortcut,
         RegistryKey,
+        Driver,
     }
 
     public enum Confidence
@@ -65,6 +76,11 @@ namespace Lindo.Core
         public Confidence Confidence { get; set; }
         public string Reason { get; set; } = string.Empty;
         public DateTime? LastModified { get; set; }
+
+        /// <summary>Per i driver: il nome pubblicato oemNN.inf da passare a pnputil.</summary>
+        public string DriverInf { get; set; } = string.Empty;
+        /// <summary>Testo da mostrare al posto del percorso (es. nome del driver).</summary>
+        public string DisplayName { get; set; } = string.Empty;
 
         public override string ToString() => $"{Kind} {Path} ({Confidence})";
     }
@@ -86,6 +102,12 @@ namespace Lindo.Core
         public string PublicDesktop { get; set; } = @"C:\Users\Public\Desktop";
         public string Temp { get; set; } = @"C:\Users\User\AppData\Local\Temp";
 
+        /// <summary>
+        /// Cartelle dei programmi sugli altri dischi (es. D:\Program Files, D:\Giochi se contiene app installate).
+        /// Si cercano residui solo qui dentro, mai nel resto dei dischi dati.
+        /// </summary>
+        public List<string> ExtraProgramRoots { get; set; } = new List<string>();
+
         public string UserPrograms => WinPath.Combine(LocalAppData, "Programs");
         public string UserStartPrograms => WinPath.Combine(UserStartMenu, "Programs");
         public string CommonStartPrograms => WinPath.Combine(CommonStartMenu, "Programs");
@@ -100,6 +122,7 @@ namespace Lindo.Core
             yield return LocalAppData;
             yield return LocalLowAppData;
             yield return UserPrograms;
+            foreach (var r in ExtraProgramRoots) yield return r;
         }
     }
 }

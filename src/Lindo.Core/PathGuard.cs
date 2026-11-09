@@ -83,6 +83,12 @@ namespace Lindo.Core
                 if (!string.IsNullOrWhiteSpace(p)) _protectedTrees.Add(WinPath.Normalize(p));
             }
 
+            foreach (var r in roots.ExtraProgramRoots.Where(x => !string.IsNullOrWhiteSpace(x)))
+            {
+                _protectedExact.Add(WinPath.Normalize(r));
+                _allowedTrees.Add(WinPath.Normalize(r));
+            }
+
             if (extraProtected != null)
                 foreach (var p in extraProtected.Where(x => !string.IsNullOrWhiteSpace(x)))
                     _protectedExact.Add(WinPath.Normalize(p));

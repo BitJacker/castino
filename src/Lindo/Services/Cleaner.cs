@@ -58,8 +58,17 @@ namespace Lindo.Services
                 }
             }
 
-            // 2) File, cartelle, collegamenti
-            foreach (var item in list.Where(i => i.Kind != LeftoverKind.RegistryKey))
+            // 2) Driver (pnputil)
+            foreach (var item in list.Where(i => i.Kind == LeftoverKind.Driver))
+            {
+                progress?.Report("Driver: " + (string.IsNullOrEmpty(item.DisplayName) ? item.DriverInf : item.DisplayName));
+                var err = DriverService.Delete(item.DriverInf);
+                if (err == null) { result.Deleted++; result.FreedBytes += item.SizeBytes; }
+                else result.Failed.Add((string.IsNullOrEmpty(item.DisplayName) ? item.DriverInf : item.DisplayName) + " (" + err + ")");
+            }
+
+            // 3) File, cartelle, collegamenti
+            foreach (var item in list.Where(i => i.Kind != LeftoverKind.RegistryKey && i.Kind != LeftoverKind.Driver))
             {
                 progress?.Report("Eliminazione: " + item.Path);
                 var isDir = Directory.Exists(item.Path);

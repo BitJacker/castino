@@ -514,5 +514,40 @@
         </Style.Triggers>
     </Style>
 
+    <!-- Interruttore on/off -->
+    <Style x:Key="Switch" TargetType="ToggleButton">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid Width="46" Height="26" Background="Transparent">
+                        <Border x:Name="track" CornerRadius="13" Background="#2A3040" BorderBrush="#3A4152" BorderThickness="1"/>
+                        <Border x:Name="fill" CornerRadius="13" Background="{StaticResource Accent}" Opacity="0"/>
+                        <Ellipse x:Name="knob" Width="18" Height="18" Fill="#C9CEDA" HorizontalAlignment="Left" Margin="4,0,0,0"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="fill" Property="Opacity" Value="1"/>
+                            <Setter TargetName="knob" Property="HorizontalAlignment" Value="Right"/>
+                            <Setter TargetName="knob" Property="Margin" Value="0,0,4,0"/>
+                            <Setter TargetName="knob" Property="Fill" Value="White"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.4"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Badge" TargetType="Border">
+        <Setter Property="CornerRadius" Value="7"/>
+        <Setter Property="Padding" Value="7,2"/>
+        <Setter Property="Margin" Value="8,0,0,0"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
     <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 </ResourceDictionary>

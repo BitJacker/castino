@@ -23,6 +23,7 @@
           <Component Id="MainExe" Guid="3F0A51D2-8B6C-4E1F-A7D3-5C2B9E8F1A60" Win64="yes">
             <File Id="LindoExe" Name="Lindo.exe" Source="$(var.BinDir)/Lindo.exe" KeyPath="yes" />
             <File Id="LindoConfig" Name="Lindo.exe.config" Source="$(var.BinDir)/Lindo.exe.config" />
+            <File Id="LindoMonitorExe" Name="LindoMonitor.exe" Source="$(var.BinDir)/LindoMonitor.exe" />
           </Component>
         </Directory>
       </Directory>

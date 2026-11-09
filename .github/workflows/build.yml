@@ -27,7 +27,7 @@ jobs:
       - name: Versione
         id: ver
         run: |
-          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"; else echo "version=1.0.0" >> "$GITHUB_OUTPUT"; fi
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"; else echo "version=1.1.0" >> "$GITHUB_OUTPUT"; fi
 
       - name: Test + build
         env:
@@ -40,7 +40,9 @@ jobs:
           path: |
             dist/Lindo.exe
             dist/Lindo.exe.config
+            dist/LindoMonitor.exe
             dist/*.msi
+            dist/*.zip
 
   windows:
     name: Prova reale su Windows
@@ -72,6 +74,51 @@ jobs:
           Get-Content selftest.txt | Select-String -Pattern '^(PASS|FAIL|RISULTATO|ORFANI|RESIDUI|PULIZIA|App Store|Roots)' | Select-Object -First 200
           if ($p.ExitCode -ne 0) { Get-Content selftest.txt | Select-String FAIL; throw "Autotest fallito" }
 
+      - name: Installa 20+ app vere e strumenti per sviluppatori (banco di prova)
+        shell: pwsh
+        run: |
+          $apps = '7zip','vlc','notepadplusplus','putty','winscp','filezilla','keepass','sumatrapdf','audacity','greenshot',
+                  'irfanview','everything','peazip','qbittorrent','treesizefree','cpu-z','crystaldiskinfo','windirstat','autohotkey','hwinfo'
+          foreach ($a in $apps) {
+            choco install $a -y --no-progress --limit-output | Out-Null
+            "{0,-18} exit {1}" -f $a, $LASTEXITCODE
+          }
+          # Strumenti che NON compaiono tra le app installate ma non vanno mai toccati
+          npm install -g cowsay --silent
+          python -m pip install --user --quiet requests
+          New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude" | Out-Null
+          New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\AnthropicClaude" | Out-Null
+          Set-Content "$env:LOCALAPPDATA\AnthropicClaude\settings.json" '{}'
+          Get-ChildItem "$env:APPDATA\npm" | Select-Object -First 5
+
+      - name: Crea residui finti (vecchi di un anno)
+        shell: pwsh
+        run: |
+          $old = (Get-Date).AddYears(-1)
+          $fake = @("$env:ProgramFiles\VecchioProgrammaTest", "$env:APPDATA\VecchiaAppTest", "$env:LOCALAPPDATA\VecchiaCacheTest", "$env:ProgramData\VecchioServizioTest")
+          foreach ($f in $fake) {
+            New-Item -ItemType Directory -Force "$f\sub" | Out-Null
+            Set-Content "$f\dati.bin" ("x" * 200000)
+            Set-Content "$f\sub\config.ini" "[a]"
+            Get-ChildItem $f -Recurse -Force | ForEach-Object { $_.LastWriteTime = $old }
+            (Get-Item $f).LastWriteTime = $old
+          }
+          "EXPECT=$($fake -join ';')" | Out-File -Append $env:GITHUB_ENV
+
+      - name: Verifica di sicurezza dei residui
+        shell: pwsh
+        run: |
+          $p = Start-Process "$env:ProgramFiles\Lindo\Lindo.exe" -ArgumentList "--safety-test `"$pwd\safety.txt`" --expect `"$env:EXPECT`"" -Wait -PassThru
+          Get-Content safety.txt
+          if ($p.ExitCode -ne 0) { throw "Verifica di sicurezza fallita" }
+
+      - name: Verifica informativa (ignorando la data di modifica)
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          $p = Start-Process "$env:ProgramFiles\Lindo\Lindo.exe" -ArgumentList "--safety-test `"$pwd\safety-0days.txt`" --expect `"$env:EXPECT`" --recent-days 0" -Wait -PassThru
+          Get-Content safety-0days.txt | Select-String -Pattern '^(SICURI|FAIL|RISULTATO|    )' | Select-Object -First 80
+
       - name: Schermate
         shell: pwsh
         run: |
@@ -79,7 +126,19 @@ jobs:
           $p = Start-Process "$env:ProgramFiles\Lindo\Lindo.exe" -ArgumentList "--screenshot `"$pwd\docs\screenshots`"" -PassThru
           if (-not $p.WaitForExit(240000)) { $p.Kill(); throw "Timeout schermate" }
           Get-ChildItem docs\screenshots
-          if ((Get-ChildItem docs\screenshots\*.png).Count -lt 4) { Get-Content "$env:LOCALAPPDATA\Lindo\lindo.log" -ErrorAction SilentlyContinue; throw "Schermate mancanti" }
+          if ((Get-ChildItem docs\screenshots\*.png).Count -lt 8) { Get-Content "$env:LOCALAPPDATA\Lindo\lindo.log" -ErrorAction SilentlyContinue; throw "Schermate mancanti" }
+
+      - name: Disinstallazione vera di 6 app (le altre devono restare intatte)
+        shell: pwsh
+        run: |
+          $survive = "$env:APPDATA\npm;$env:USERPROFILE\.claude;$env:LOCALAPPDATA\AnthropicClaude;$env:ProgramFiles\Git"
+          $p = Start-Process "$env:ProgramFiles\Lindo\Lindo.exe" -ArgumentList "--test-uninstall `"$pwd\uninstall.txt`" --apps `"7-Zip;VLC;Notepad++;PuTTY;WinSCP;KeePass`" --must-survive `"$survive`"" -Wait -PassThru
+          Get-Content uninstall.txt
+          if ($p.ExitCode -ne 0) { throw "Test di disinstallazione fallito" }
+          # Gli strumenti devono funzionare ancora
+          node --version; npm --version; git --version; python --version
+          cowsay "Lindo non ha rotto nulla" 
+          if ($LASTEXITCODE -ne 0) { throw "npm globale non funziona più" }
 
       - name: Disinstalla l'MSI
         shell: pwsh
@@ -95,6 +154,9 @@ jobs:
           name: risultati-windows
           path: |
             selftest.txt
+            safety.txt
+            safety-0days.txt
+            uninstall.txt
             install.log
             docs/screenshots/*.png
 
@@ -135,10 +197,12 @@ jobs:
             **Scarica uno dei due file qui sotto (sezione Assets):**
 
             - `Lindo-${{ steps.ver.outputs.version }}.msi`: installazione classica (menu Start, Desktop, compare tra le app installate).
-            - `Lindo.exe`: versione portatile, si avvia senza installare nulla.
+            - `Lindo-${{ steps.ver.outputs.version }}-portatile.zip`: versione portatile completa (con il monitor in background).
+            - `Lindo.exe`: solo l'app, senza il monitor in background.
 
             Requisiti: Windows 10 (1903 o successivo) o Windows 11. Se compare "PC protetto da Windows",
             clicca *Ulteriori informazioni → Esegui comunque* (l'eseguibile non è firmato digitalmente).
           files: |
-            dist/Lindo.exe
             dist/*.msi
+            dist/*.zip
+            dist/Lindo.exe

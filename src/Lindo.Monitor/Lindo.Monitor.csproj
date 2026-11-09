@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>LindoMonitor</AssemblyName>
+    <RootNamespace>Lindo.Monitor</RootNamespace>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\..\assets\lindo.ico</ApplicationIcon>
+    <Version>1.1.0</Version>
+    <Product>Lindo</Product>
+    <Description>Lindo Monitor - registra quali app usi e quanto consumano</Description>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Lindo.Core\Usage.cs" Link="Core\Usage.cs" />
+    <Compile Include="..\Lindo.Core\WinPath.cs" Link="Core\WinPath.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+</Project>
