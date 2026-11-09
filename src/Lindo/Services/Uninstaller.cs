@@ -92,6 +92,7 @@ namespace Lindo.Services
             status?.Report("Follow the instructions in the uninstaller window.");
             var uninstallerDir = SafeDir(psi.FileName);
 
+            DateTime? goneSince = null;
             while (!skip.IsCancellationRequested)
             {
                 await Task.Delay(800).ConfigureAwait(false);
@@ -106,7 +107,12 @@ namespace Lindo.Services
                 }
                 // Alcuni disinstallatori (es. Notepad++) tolgono la voce dall'elenco e POI fanno ancora domande:
                 // si considera finito solo se nessun loro processo ha più una finestra aperta.
-                if (!mainAlive && !IsStillInstalled(app) && !children.Any(HasWindow)) break;
+                // Al massimo 90 secondi dopo che l'app è sparita dall'elenco: alcune finestre restano aperte a vuoto.
+                if (!mainAlive && !IsStillInstalled(app))
+                {
+                    if (goneSince == null) goneSince = DateTime.Now;
+                    if (!children.Any(HasWindow) || DateTime.Now - goneSince.Value > TimeSpan.FromSeconds(90)) break;
+                }
             }
 
             if (skip.IsCancellationRequested) return UninstallOutcome.Skipped;
@@ -129,9 +135,12 @@ namespace Lindo.Services
             catch { return path; }
         }
 
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool IsWindowVisible(IntPtr hwnd);
+
         private static bool HasWindow(Process p)
         {
-            try { p.Refresh(); return !p.HasExited && p.MainWindowHandle != IntPtr.Zero; } catch { return false; }
+            try { p.Refresh(); return !p.HasExited && p.MainWindowHandle != IntPtr.Zero && IsWindowVisible(p.MainWindowHandle); } catch { return false; }
         }
 
         private static string SafeDir(string file)
