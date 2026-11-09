@@ -181,6 +181,83 @@ namespace Lindo
             foreach (var a in actions) _optimize.Add(new OptimizeItem(a));
             await RefreshOptimizeStateAsync();
             _optimizeLoaded = true;
+            _ = RefreshResourcesAsync();
+        }
+
+        // ----------------------------------------------------------------- risorse (CPU, RAM, GPU)
+
+        private sealed class UsageLine { public string Name { get; set; } public string Value { get; set; } }
+
+        private GpuInfo _gpu;
+
+        private static string Pretty(ProcessUsage u) => u.Count > 1 ? $"{u.Name} ({u.Count})" : u.Name;
+
+        private async Task RefreshResourcesAsync()
+        {
+            RefreshResourcesButton.IsEnabled = false;
+            try
+            {
+                var snapTask = Task.Run(() => ResourceService.Measure());
+                var gpuTask = _gpu == null ? Task.Run(() => ResourceService.ReadGpu()) : Task.FromResult(_gpu);
+                var snap = await snapTask;
+                _gpu = await gpuTask;
+
+                CpuValue.Text = Math.Round(snap.CpuPercent) + "%";
+                CpuBar.Value = snap.CpuPercent;
+                CpuTop.ItemsSource = snap.TopCpu.Count == 0
+                    ? new List<UsageLine> { new UsageLine { Name = "Il processore è a riposo", Value = "" } }
+                    : snap.TopCpu.Select(u => new UsageLine { Name = Pretty(u), Value = u.CpuPercent.ToString("0.0") + "%" }).ToList();
+
+                if (snap.RamTotal > 0)
+                {
+                    var used = snap.RamTotal - snap.RamAvailable;
+                    RamValue.Text = snap.MemoryLoad + "%";
+                    RamBar.Value = snap.MemoryLoad;
+                    RamDetail.Text = $"{SizeFormat.Format(used)} usati su {SizeFormat.Format(snap.RamTotal)} · liberi {SizeFormat.Format(snap.RamAvailable)}";
+                }
+                RamTop.ItemsSource = snap.TopRam.Select(u => new UsageLine { Name = Pretty(u), Value = SizeFormat.Format(u.MemoryBytes) }).ToList();
+
+                ShowGpu();
+            }
+            catch (Exception ex) { Log.Write("Risorse: " + ex.Message); }
+            finally { RefreshResourcesButton.IsEnabled = true; }
+        }
+
+        private void ShowGpu()
+        {
+            if (_gpu == null) return;
+            GpuNames.Text = _gpu.Names.Count == 0 ? "Scheda video non riconosciuta" : string.Join("\n", _gpu.Names);
+            GpuScheduling.Text = _gpu.HardwareScheduling == true
+                ? "Pianificazione GPU con accelerazione hardware: attiva"
+                : _gpu.HardwareScheduling == false
+                    ? "Pianificazione GPU con accelerazione hardware: non attiva. Puoi provarla da «Impostazioni grafica» (richiede un riavvio; in alcuni giochi aiuta, in altri no)."
+                    : "Pianificazione GPU con accelerazione hardware: non disponibile o mai impostata su questo PC.";
+            GpuGameButton.Visibility = _gpu.HasTwoGpus ? Visibility.Visible : Visibility.Collapsed;
+            var games = ResourceService.LindoGpuPreferences();
+            GpuGames.Text = !_gpu.HasTwoGpus
+                ? "Hai una sola scheda video: i giochi la usano già."
+                : games.Count == 0 ? "Hai due schede video: scegli un gioco da far girare su quella più potente."
+                : "Sulla scheda dedicata: " + string.Join(", ", games.Select(System.IO.Path.GetFileNameWithoutExtension));
+        }
+
+        private async void OnRefreshResources(object sender, RoutedEventArgs e) => await RefreshResourcesAsync();
+
+        private void OnOpenGraphicsSettings(object sender, RoutedEventArgs e) => ResourceService.OpenGraphicsSettings();
+
+        private void OnGameOnDedicatedGpu(object sender, RoutedEventArgs e)
+        {
+            var dlg = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Scegli il gioco (file .exe) da far girare sulla scheda video dedicata",
+                Filter = "Programmi (*.exe)|*.exe",
+                CheckFileExists = true,
+            };
+            if (dlg.ShowDialog(this) != true) return;
+            var err = ResourceService.SetHighPerformanceGpu(dlg.FileName);
+            if (err != null) { ShowToast("Non riuscito: " + err, ok: false); return; }
+            ShowToast(System.IO.Path.GetFileNameWithoutExtension(dlg.FileName) + " userà la scheda video dedicata (dal prossimo avvio del gioco)");
+            RestoreButton.IsEnabled = true;
+            ShowGpu();
         }
 
         private async Task RefreshOptimizeStateAsync()
@@ -200,7 +277,8 @@ namespace Lindo
             OptimizeStatus.Text = done == reversible.Count
                 ? "Il PC è già configurato al meglio. Puoi comunque ripulire i file temporanei."
                 : "Seleziona cosa vuoi migliorare e premi «Ottimizza ora». Alcune modifiche valgono dal prossimo accesso.";
-            RestoreButton.IsEnabled = _optimize.Any(o => o.Reversible && OptimizeService.HasBackup(o.Action.Id));
+            RestoreButton.IsEnabled = _optimize.Any(o => o.Reversible && OptimizeService.HasBackup(o.Action.Id)) ||
+                                      ResourceService.LindoGpuPreferences().Count > 0;
         }
 
         private async void OnOptimizeClick(object sender, RoutedEventArgs e)
@@ -239,6 +317,8 @@ namespace Lindo
                 var err = await Task.Run(() => { try { return o.Action.Restore(); } catch (Exception ex) { return ex.Message; } });
                 Log.Write("Ripristina " + o.Action.Id + " → " + (err ?? "ok"));
             }
+            await Task.Run(() => ResourceService.RestoreGpuPreferences());
+            ShowGpu();
             _startupEntries = new List<StartupEntry>();
             _startupLoaded = false;
             foreach (var o in _optimize) o.IsSelected = o.Action.DefaultSelected;

@@ -88,6 +88,14 @@ Un pulsante, tutto **annullabile** con "Ripristina tutto":
 - togli dall'avvio le app inutili (launcher, aggiornatori, chat, VPN…) lasciando antivirus, driver, audio e touchpad;
 - pulizia dei file temporanei.
 
+In cima alla pagina, **CPU, RAM e scheda video in tempo reale**:
+- uso del processore e della memoria e i programmi che ne consumano di più in questo momento
+  (le schede di Chrome, per esempio, vengono sommate);
+- nome della scheda video e stato della *pianificazione GPU con accelerazione hardware*: Lindo non la
+  cambia da solo (i suoi effetti dipendono dal PC), ma apre la pagina giusta di Impostazioni → Grafica;
+- se il PC ha **due schede video** (integrata + dedicata), il pulsante *Gioco sulla scheda dedicata…* fa usare
+  a un gioco quella più potente, come la stessa opzione di Impostazioni. Anche questo si annulla con "Ripristina tutto".
+
 ### 🩺 Errori e crash
 Legge dal Registro eventi di Windows i programmi chiusi all'improvviso, i blocchi, le **schermate blu** e gli
 spegnimenti improvvisi degli ultimi 30 giorni, e li spiega in italiano con cosa fare

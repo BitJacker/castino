@@ -742,6 +742,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <StackPanel Margin="0,0,0,18">
@@ -773,7 +774,65 @@
                         </StackPanel>
                     </Grid>
                 </Border>
-                <ListBox x:Name="OptimizeList" Grid.Row="2" Style="{StaticResource PlainList}" Margin="0,0,-10,0" Padding="0,0,10,12"
+                <!-- Risorse in tempo reale: CPU, RAM, scheda video -->
+                <UniformGrid x:Name="ResourcesPanel" Grid.Row="2" Columns="3" Margin="-5,0,-5,14">
+                    <UniformGrid.Resources>
+                        <DataTemplate x:Key="UsageRowTemplate">
+                            <Grid Margin="0,3,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" FontSize="12.5"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Value}" FontSize="12.5" Foreground="{StaticResource Subtle}" Margin="10,0,0,0"/>
+                            </Grid>
+                        </DataTemplate>
+                    </UniformGrid.Resources>
+                    <Border CornerRadius="16" Background="{StaticResource Card}" Padding="18,14" Margin="5,0">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="&#xE9D9;" Style="{StaticResource Glyph}" Foreground="#A99BFF" Margin="0,0,8,0"/>
+                                <TextBlock Text="Processore (CPU)" Foreground="{StaticResource Subtle}" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock x:Name="CpuValue" Text="…" FontFamily="{StaticResource DisplayFont}" FontSize="26" FontWeight="Bold" Margin="0,6,0,4"/>
+                            <ProgressBar x:Name="CpuBar" Height="5" Maximum="100" Background="#22FFFFFF" BorderThickness="0" Foreground="{StaticResource AccentHorizontal}"/>
+                            <TextBlock Text="Usano di più adesso" FontSize="11.5" Foreground="{StaticResource Faint}" Margin="0,10,0,2"/>
+                            <ItemsControl x:Name="CpuTop" ItemTemplate="{StaticResource UsageRowTemplate}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border CornerRadius="16" Background="{StaticResource Card}" Padding="18,14" Margin="5,0">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="&#xE950;" Style="{StaticResource Glyph}" Foreground="#A99BFF" Margin="0,0,8,0"/>
+                                <TextBlock Text="Memoria (RAM)" Foreground="{StaticResource Subtle}" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock x:Name="RamValue" Text="…" FontFamily="{StaticResource DisplayFont}" FontSize="26" FontWeight="Bold" Margin="0,6,0,4"/>
+                            <ProgressBar x:Name="RamBar" Height="5" Maximum="100" Background="#22FFFFFF" BorderThickness="0" Foreground="{StaticResource AccentHorizontal}"/>
+                            <TextBlock x:Name="RamDetail" Text="" FontSize="11.5" Foreground="{StaticResource Faint}" Margin="0,10,0,2"/>
+                            <ItemsControl x:Name="RamTop" ItemTemplate="{StaticResource UsageRowTemplate}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border CornerRadius="16" Background="{StaticResource Card}" Padding="18,14" Margin="5,0">
+                        <StackPanel>
+                            <DockPanel>
+                                <Button x:Name="RefreshResourcesButton" DockPanel.Dock="Right" Style="{StaticResource GhostButton}" Padding="10,4" FontSize="12"
+                                        Content="Aggiorna" Click="OnRefreshResources" AutomationProperties.Name="Aggiorna risorse"/>
+                                <TextBlock Text="&#xE7F4;" Style="{StaticResource Glyph}" Foreground="#A99BFF" Margin="0,0,8,0"/>
+                                <TextBlock Text="Scheda video (GPU)" Foreground="{StaticResource Subtle}" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock x:Name="GpuNames" Text="…" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,8,0,2"/>
+                            <TextBlock x:Name="GpuScheduling" Text="" FontSize="12" Foreground="{StaticResource Subtle}" TextWrapping="Wrap"/>
+                            <WrapPanel Margin="0,10,0,0">
+                                <Button x:Name="GpuSettingsButton" Style="{StaticResource GhostButton}" Padding="12,6" FontSize="12" Margin="0,0,8,6"
+                                        Content="Impostazioni grafica" Click="OnOpenGraphicsSettings" AutomationProperties.Name="Impostazioni grafica"/>
+                                <Button x:Name="GpuGameButton" Style="{StaticResource PrimaryButton}" Padding="12,6" FontSize="12" Margin="0,0,0,6" Visibility="Collapsed"
+                                        Content="Gioco sulla scheda dedicata…" Click="OnGameOnDedicatedGpu" AutomationProperties.Name="Gioco sulla scheda dedicata"/>
+                            </WrapPanel>
+                            <TextBlock x:Name="GpuGames" Text="" FontSize="11.5" Foreground="{StaticResource Faint}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+                <ListBox x:Name="OptimizeList" Grid.Row="3" Style="{StaticResource PlainList}" Margin="0,0,-10,0" Padding="0,0,10,12"
                          VirtualizingPanel.IsVirtualizingWhenGrouping="True">
                     <ListBox.GroupStyle>
                         <GroupStyle>

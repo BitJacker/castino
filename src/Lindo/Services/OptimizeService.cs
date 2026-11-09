@@ -324,6 +324,13 @@ namespace Lindo.Services
             };
         }
 
+        // Accesso al file dei valori originali per altre funzioni (es. scheda video per i giochi)
+        internal static void RememberValue(string key, string value) => Remember(key, value);
+        internal static string RecallValue(string key) => Recall(key);
+        internal static void ForgetValue(string key) => Forget(key);
+        internal static IEnumerable<string> BackupKeys(string prefix) =>
+            LoadBackup().Keys.Where(k => k.StartsWith(prefix)).Select(k => k.Substring(prefix.Length)).ToList();
+
         public static bool HasBackup(string id) => LoadBackup().Keys.Any(k => k == id || k.StartsWith(id + "|"));
     }
 }

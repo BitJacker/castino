@@ -325,6 +325,13 @@ $dvrBefore = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\
 $mouseBefore = (Get-ItemProperty 'HKCU:\Control Panel\Mouse').MouseSpeed
 Click (Find-ById $script:win 'NavOptimize')
 Wait-For { $t = Text-Of $script:win 'OptimizeScore'; $t -and $t -ne 'Analisi…' } 60 'analisi ottimizzazioni' | Out-Null
+$res = Wait-For { $c = Text-Of $script:win 'CpuValue'; $r = Text-Of $script:win 'RamValue'; if ($c -like '*%' -and $r -like '*%') { "$c|$r" } } 90 'lettura CPU e RAM'
+Log ("Risorse lette da Lindo: CPU " + (Text-Of $script:win 'CpuValue') + ", RAM " + (Text-Of $script:win 'RamValue') + " · GPU: " + (Text-Of $script:win 'GpuNames'))
+Check ($res -ne $null) "Lindo mostra l'uso di CPU e RAM"
+$realRam = [math]::Round((Get-CimInstance Win32_OperatingSystem | ForEach-Object { 100 - 100 * $_.FreePhysicalMemory / $_.TotalVisibleMemorySize }))
+$lindoRam = [int]((Text-Of $script:win 'RamValue').TrimEnd('%'))
+Check ([math]::Abs($realRam - $lindoRam) -le 15) "RAM di Lindo ($lindoRam%) vicina a quella di Windows ($realRam%)"
+Check ((Text-Of $script:win 'GpuNames') -notin @('', '…')) "Lindo riconosce la scheda video"
 Shot 'ottimizza'
 Click (Find-ById $script:win 'OptimizeButton')
 $st = Wait-Dialog-End 300
