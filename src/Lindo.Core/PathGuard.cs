@@ -31,7 +31,7 @@ namespace Lindo.Core
             "Windows Kits", "Microsoft SDKs", "Microsoft Visual Studio", "Microsoft SQL Server", "IIS", "IIS Express",
             "Uninstall Information", "MicrosoftEdgeBackups", "Diagnostics", "DeviceSync", "Device Stage",
             "Sun", "Oracle", "Java", "Mozilla Maintenance Service", "Package Store", "Sandbox", "SystemTemp",
-            "PlaceholderTileLogoFolder", "Lindo",
+            "PlaceholderTileLogoFolder", "WSL", "Microsoft Office", "Lindo",
         };
 
         public PathGuard(SystemRoots roots, IEnumerable<string> extraProtected = null)

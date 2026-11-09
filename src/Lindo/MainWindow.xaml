@@ -39,14 +39,14 @@
                     </Grid>
 
                     <StackPanel Grid.Column="1" Margin="14,0,16,0" VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Name}" FontSize="14.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
-                                       MaxWidth="460" ToolTip="{Binding Name}"/>
-                            <Border CornerRadius="6" Background="{StaticResource AccentSoft}" Padding="6,1" Margin="8,0,0,0"
+                        <DockPanel LastChildFill="True">
+                            <Border DockPanel.Dock="Right" CornerRadius="6" Background="{StaticResource AccentSoft}" Padding="6,1" Margin="8,0,0,0"
                                     VerticalAlignment="Center" Visibility="{Binding IsStore, Converter={StaticResource BoolToVis}}">
                                 <TextBlock Text="Store" FontSize="11" Foreground="#A99BFF" FontWeight="SemiBold"/>
                             </Border>
-                        </StackPanel>
+                            <TextBlock Text="{Binding Name}" FontSize="14.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                                       ToolTip="{Binding Name}"/>
+                        </DockPanel>
                         <TextBlock Text="{Binding Subtitle}" Foreground="{StaticResource Subtle}" FontSize="12.5" Margin="0,3,0,0"
                                    TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
@@ -109,10 +109,12 @@
                             <TextBlock Text="{Binding KindText}" Foreground="{StaticResource Faint}" FontSize="12" Margin="10,0,0,0" VerticalAlignment="Center"/>
                             <TextBlock Text="·" Foreground="{StaticResource Faint}" FontSize="12" Margin="6,0" VerticalAlignment="Center"/>
                             <TextBlock Text="{Binding Reason}" Foreground="{StaticResource Subtle}" FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                            <TextBlock Text="{Binding DateText}" Foreground="{StaticResource Faint}" FontSize="12" Margin="10,0,0,0" VerticalAlignment="Center"/>
                         </StackPanel>
                     </StackPanel>
-                    <TextBlock Grid.Column="3" Text="{Binding SizeText}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0"/>
+                    <StackPanel Grid.Column="3" VerticalAlignment="Center" Margin="12,0">
+                        <TextBlock Text="{Binding SizeText}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                        <TextBlock Text="{Binding DateText}" Foreground="{StaticResource Faint}" FontSize="11.5" HorizontalAlignment="Right" Margin="0,3,0,0"/>
+                    </StackPanel>
                     <Button Grid.Column="4" Style="{StaticResource GhostButton}" Padding="10,6" Click="OnOpenLeftoverClick" Tag="{Binding}"
                             ToolTip="Mostra in Esplora file">
                         <TextBlock Text="&#xE838;" FontFamily="{StaticResource Icons}" FontSize="14"/>
@@ -153,7 +155,7 @@
                     <Image Source="pack://application:,,,/Assets/logo.png" Width="38" Height="38" RenderOptions.BitmapScalingMode="HighQuality"/>
                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="Lindo" FontFamily="{StaticResource DisplayFont}" FontSize="20" FontWeight="Bold"/>
-                        <TextBlock Text="Disinstalla senza lasciare tracce" Foreground="{StaticResource Faint}" FontSize="11.5"/>
+                        <TextBlock Text="Disinstalla senza residui" Foreground="{StaticResource Faint}" FontSize="11.5"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -321,11 +323,11 @@
                 </Grid>
 
                 <Border x:Name="OrphanWarning" Grid.Row="1" CornerRadius="12" Padding="14,10" Background="{StaticResource WarningSoft}" Margin="0,0,0,14" Visibility="Collapsed">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#xE7BA;" Style="{StaticResource Glyph}" Foreground="{StaticResource Warning}" Margin="0,0,10,0"/>
-                        <TextBlock TextWrapping="Wrap" Foreground="#F5D98B" FontSize="12.5" MaxWidth="760"
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Left" Text="&#xE7BA;" Style="{StaticResource Glyph}" Foreground="{StaticResource Warning}" Margin="0,0,10,0"/>
+                        <TextBlock TextWrapping="Wrap" Foreground="#F5D98B" FontSize="12.5"
                                    Text="Nessun elemento è selezionato in automatico: controlla ogni voce prima di eliminarla. Qui compaiono solo cartelle che nessun programma installato sembra usare, ma potrebbero esserci app portatili o dati che vuoi tenere."/>
-                    </StackPanel>
+                    </DockPanel>
                 </Border>
 
                 <Grid Grid.Row="2">

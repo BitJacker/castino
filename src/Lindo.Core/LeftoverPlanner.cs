@@ -295,6 +295,9 @@ namespace Lindo.Core
                     var name = WinPath.GetFileName(dir);
                     if (!seen.Add(WinPath.Normalize(dir))) continue;
                     if (PathGuard.SystemFolderNames.Contains(name)) continue;
+                    // Componenti di Windows / Microsoft: mai proposti come orfani
+                    if (name.StartsWith("Microsoft", StringComparison.OrdinalIgnoreCase) ||
+                        name.StartsWith("Windows", StringComparison.OrdinalIgnoreCase)) continue;
                     if (name.StartsWith(".", StringComparison.Ordinal) || name.StartsWith("{", StringComparison.Ordinal)) continue;
                     if (LooksLikeId(name)) continue;
                     if (!_guard.CanDelete(dir)) continue;

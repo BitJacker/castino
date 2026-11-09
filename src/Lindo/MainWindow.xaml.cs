@@ -650,7 +650,8 @@ namespace Lindo
         {
             var sel = _orphans.Where(o => o.IsSelected).ToList();
             var total = _orphans.Sum(o => o.SizeBytes);
-            OrphansSelection.Text = $"{sel.Count} di {_orphans.Count} selezionati · {SizeFormat.Format(sel.Sum(o => o.SizeBytes))} su {SizeFormat.Format(total)}";
+            var selSize = sel.Sum(o => o.SizeBytes);
+            OrphansSelection.Text = $"{sel.Count} di {_orphans.Count} selezionati · {(selSize > 0 ? SizeFormat.Format(selSize) : "0 B")} su {SizeFormat.Format(total)}";
             DeleteOrphansButton.IsEnabled = sel.Count > 0;
             OrphansSelectAll.IsChecked = sel.Count > 0 && sel.Count == _orphans.Count;
         }

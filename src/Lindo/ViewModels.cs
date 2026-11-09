@@ -184,7 +184,7 @@ namespace Lindo
         public string SizeText => Model.Kind == LeftoverKind.RegistryKey ? "" : SizeFormat.Format(_sizeBytes);
 
         public string DateText => Model.LastModified.HasValue
-            ? "Modificata il " + Model.LastModified.Value.ToString("d MMM yyyy", new System.Globalization.CultureInfo("it-IT"))
+            ? Model.LastModified.Value.ToString("d MMM yyyy", new System.Globalization.CultureInfo("it-IT"))
             : string.Empty;
     }
 
