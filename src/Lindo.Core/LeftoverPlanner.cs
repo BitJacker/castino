@@ -146,7 +146,15 @@ namespace Lindo.Core
                 {
                     var name = WinPath.GetFileName(dir);
                     if (name.Equals("Startup", StringComparison.OrdinalIgnoreCase)) continue;
-                    var s = IsPublisherFolder(name, app) ? MatchStrength.None : NameMatcher.Match(name, app.Name, installFolder, app.Publisher);
+                    // Cartelle di Windows nel menu Start (Windows PowerShell, Accessori, Strumenti…): mai in blocco
+                    var systemFolder = name.StartsWith("Windows", StringComparison.OrdinalIgnoreCase) ||
+                                       name.StartsWith("Microsoft", StringComparison.OrdinalIgnoreCase) ||
+                                       name.Equals("Accessories", StringComparison.OrdinalIgnoreCase) ||
+                                       name.Equals("Administrative Tools", StringComparison.OrdinalIgnoreCase) ||
+                                       name.Equals("System Tools", StringComparison.OrdinalIgnoreCase) ||
+                                       name.Equals("Accessibility", StringComparison.OrdinalIgnoreCase) ||
+                                       name.Equals("Maintenance", StringComparison.OrdinalIgnoreCase);
+                    var s = IsPublisherFolder(name, app) || systemFolder ? MatchStrength.None : NameMatcher.Match(name, app.Name, installFolder, app.Publisher);
                     if (s >= MatchStrength.Medium && !OwnedByOther(dir, s, others))
                         Add(LeftoverKind.Shortcut, dir, ToConfidence(s), "Cartella nel menu Start");
                     else
@@ -209,22 +217,32 @@ namespace Lindo.Core
                     !file.EndsWith(".url", StringComparison.OrdinalIgnoreCase)) continue;
                 var name = WinPath.GetFileName(file);
                 name = name.Substring(0, name.Length - 4);
+                var windowsName = name.StartsWith("Windows", StringComparison.OrdinalIgnoreCase) ||
+                                  name.StartsWith("Microsoft", StringComparison.OrdinalIgnoreCase);
 
                 // Collegamento che punta dentro la cartella del programma: certo
                 if (ShortcutTargetResolver != null && file.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
                 {
                     string target = null;
                     try { target = ShortcutTargetResolver(file); } catch { /* collegamento illeggibile */ }
-                    if (!string.IsNullOrWhiteSpace(target) && installDirs.Any(d => WinPath.IsSameOrInside(target, d)))
+                    if (!string.IsNullOrWhiteSpace(target))
                     {
-                        add(LeftoverKind.Shortcut, file, Confidence.High, "Collegamento al programma");
+                        if (installDirs.Any(d => WinPath.IsSameOrInside(target, d)))
+                            add(LeftoverKind.Shortcut, file, Confidence.High, "Collegamento al programma");
+                        else if (!windowsName && !_fs.FileExists(target) && !_fs.DirectoryExists(target) &&
+                                 NameMatcher.Match(name, app.Name, app.InstallFolderName, app.Publisher) == MatchStrength.Strong &&
+                                 !OwnedByOtherName(name, MatchStrength.Strong, others))
+                            add(LeftoverKind.Shortcut, file, Confidence.Medium, "Collegamento rotto al programma");
+                        // Punta a qualcos'altro che esiste: appartiene a un altro programma, non si tocca
                         continue;
                     }
                 }
 
+                // Senza destinazione leggibile: solo nome identico
+                if (windowsName) continue;
                 var s = NameMatcher.Match(name, app.Name, app.InstallFolderName, app.Publisher);
-                if (s >= MatchStrength.Medium && !OwnedByOtherName(name, s, others))
-                    add(LeftoverKind.Shortcut, file, ToConfidence(s), "Collegamento");
+                if (s == MatchStrength.Strong && !OwnedByOtherName(name, s, others))
+                    add(LeftoverKind.Shortcut, file, Confidence.Medium, "Collegamento");
             }
         }
 

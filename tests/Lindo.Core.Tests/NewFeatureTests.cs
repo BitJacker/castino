@@ -225,3 +225,37 @@ EPSON=""EPSON""
         }
     }
 }
+
+namespace Lindo.Core.Tests
+{
+    public class RegressionTests
+    {
+        [Fact]
+        public void PowerShell7DoesNotTakeWindowsPowerShellShortcuts()
+        {
+            var fs = new FakeFs()
+                .Dir(@"C:\Program Files\PowerShell\7")
+                .File(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows PowerShell ISE.lnk",
+                      @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows PowerShell.lnk",
+                      @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\PowerShell\PowerShell 7 (x64).lnk",
+                      @"C:\Windows\System32\WindowsPowerShell\v1.0\powershell_ise.exe");
+            var app = new AppInfo { Id = "ps", Name = "PowerShell 7-x64", Publisher = "Microsoft Corporation", InstallLocation = @"C:\Program Files\PowerShell\7" };
+            var planner = new LeftoverPlanner(new SystemRoots(), fs, null)
+            {
+                ShortcutTargetResolver = f => f.Contains("ISE") ? @"C:\Windows\System32\WindowsPowerShell\v1.0\powershell_ise.exe"
+                                       : f.Contains("Windows PowerShell.lnk") ? @"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+                                       : @"C:\Program Files\PowerShell\7\pwsh.exe",
+            };
+            var paths = planner.FindLeftovers(app, new[] { app }).Select(r => r.Path).ToList();
+            Assert.DoesNotContain(paths, p => p.Contains("Windows PowerShell"));
+            Assert.Contains(paths, p => p.EndsWith("PowerShell 7 (x64).lnk") || p.EndsWith(@"Programs\PowerShell"));
+        }
+
+        [Fact]
+        public void SimilarNameIsOnlyWeak()
+        {
+            Assert.Equal(MatchStrength.Weak, NameMatcher.Match("Windows PowerShell ISE", "PowerShell 7-x64"));
+            Assert.Equal(MatchStrength.Weak, NameMatcher.Match("DiscordPTB", "Discord"));
+        }
+    }
+}

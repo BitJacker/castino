@@ -166,8 +166,9 @@ namespace Lindo.Core
 
             if (appCompact.Length >= 4 && candCompact.StartsWith(appCompact, StringComparison.Ordinal))
             {
-                // "Discord" vs cartella "DiscordPTB": possibile ma meno sicuro
-                return candCompact.Length - appCompact.Length <= 4 ? MatchStrength.Medium : MatchStrength.Weak;
+                // "PowerShell" vs "Windows PowerShell ISE" o "Discord" vs "DiscordPTB": potrebbe essere
+                // un altro prodotto con un nome simile → solo "da verificare", mai preselezionato
+                return MatchStrength.Weak;
             }
 
             // Stessi token in ordine diverso o sottoinsieme significativo

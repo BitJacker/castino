@@ -86,10 +86,17 @@ jobs:
           # Strumenti che NON compaiono tra le app installate ma non vanno mai toccati
           npm install -g cowsay --silent
           python -m pip install --user --quiet requests
+          $npmPrefix = (npm prefix -g).Trim()
+          "NPM_PREFIX=$npmPrefix" | Out-File -Append $env:GITHUB_ENV
           New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude" | Out-Null
-          New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\AnthropicClaude" | Out-Null
-          Set-Content "$env:LOCALAPPDATA\AnthropicClaude\settings.json" '{}'
-          Get-ChildItem "$env:APPDATA\npm" | Select-Object -First 5
+          # Cartelle di strumenti VECCHIE (un anno) che non risultano installate: non devono MAI essere "sicure"
+          $old = (Get-Date).AddYears(-1)
+          foreach ($t in @("$env:APPDATA\npm", "$env:LOCALAPPDATA\npm-cache", "$env:APPDATA\Claude", "$env:LOCALAPPDATA\AnthropicClaude", "$env:LOCALAPPDATA\pip", "$env:APPDATA\Code", "$env:LOCALAPPDATA\Docker")) {
+            New-Item -ItemType Directory -Force $t | Out-Null
+            Set-Content "$t\dati.json" '{}'
+            Get-ChildItem $t -Recurse -Force | ForEach-Object { $_.LastWriteTime = $old }
+            (Get-Item $t).LastWriteTime = $old
+          }
 
       - name: Crea residui finti (vecchi di un anno)
         shell: pwsh
@@ -131,7 +138,7 @@ jobs:
       - name: Disinstallazione vera di 6 app (le altre devono restare intatte)
         shell: pwsh
         run: |
-          $survive = "$env:APPDATA\npm;$env:USERPROFILE\.claude;$env:LOCALAPPDATA\AnthropicClaude;$env:ProgramFiles\Git"
+          $survive = "$env:NPM_PREFIX;$env:APPDATA\npm;$env:LOCALAPPDATA\npm-cache;$env:APPDATA\Claude;$env:USERPROFILE\.claude;$env:LOCALAPPDATA\AnthropicClaude;$env:ProgramFiles\Git"
           $p = Start-Process "$env:ProgramFiles\Lindo\Lindo.exe" -ArgumentList "--test-uninstall `"$pwd\uninstall.txt`" --apps `"7-Zip;VLC;Notepad++;PuTTY;WinSCP;KeePass`" --must-survive `"$survive`"" -Wait -PassThru
           Get-Content uninstall.txt
           if ($p.ExitCode -ne 0) { throw "Test di disinstallazione fallito" }
