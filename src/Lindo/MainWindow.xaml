@@ -334,7 +334,7 @@
                         <RadioButton x:Name="FilterAll" Style="{StaticResource Chip}" Content="All" IsChecked="True" GroupName="flt" Checked="OnFilterChanged"/>
                         <RadioButton x:Name="FilterDesktop" Style="{StaticResource Chip}" Content="Programs" GroupName="flt" Checked="OnFilterChanged"/>
                         <RadioButton x:Name="FilterStore" Style="{StaticResource Chip}" Content="Store" GroupName="flt" Checked="OnFilterChanged"/>
-                        <RadioButton x:Name="FilterDrivers" Style="{StaticResource Chip}" Content="Driver" GroupName="flt" Checked="OnFilterChanged"/>
+                        <RadioButton x:Name="FilterDrivers" Style="{StaticResource Chip}" Content="Drivers" GroupName="flt" Checked="OnFilterChanged"/>
                         <RadioButton x:Name="FilterUnused" Style="{StaticResource Chip}" GroupName="flt" Checked="OnFilterChanged">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE823;" FontFamily="{StaticResource Icons}" FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0"/>
