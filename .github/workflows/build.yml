@@ -135,19 +135,17 @@ jobs:
           Get-ChildItem docs\screenshots
           if ((Get-ChildItem docs\screenshots\*.png).Count -lt 8) { Get-Content "$env:LOCALAPPDATA\Lindo\lindo.log" -ErrorAction SilentlyContinue; throw "Schermate mancanti" }
 
-      - name: Disinstallazione vera di 6 app (le altre devono restare intatte)
-        shell: pwsh
-        timeout-minutes: 30
+      - name: Robot che usa Lindo come una persona e verifica tutto
+        shell: powershell
+        timeout-minutes: 40
         run: |
           $survive = "$env:NPM_PREFIX;$env:APPDATA\npm;$env:LOCALAPPDATA\npm-cache;$env:APPDATA\Claude;$env:USERPROFILE\.claude;$env:LOCALAPPDATA\AnthropicClaude;$env:ProgramFiles\Git"
-          $p = Start-Process "$env:ProgramFiles\Lindo\Lindo.exe" -ArgumentList "--test-uninstall `"$pwd\uninstall.txt`" --apps `"7-Zip;VLC;Notepad++;PuTTY;WinSCP;KeePass`" --must-survive `"$survive`"" -PassThru
-          if (-not $p.WaitForExit(1500000)) { Get-Content uninstall.txt; Get-Process | Sort-Object StartTime -ErrorAction SilentlyContinue | Select-Object -Last 15 Name,Id,StartTime; throw "Test bloccato" }
-          Get-Content uninstall.txt
-          if ($p.ExitCode -ne 0) { throw "Test di disinstallazione fallito" }
-          # Gli strumenti devono funzionare ancora
+          & .\tests\gui\robot.ps1 -Out "$PWD\docs\test-robot" -ExpectOrphans $env:EXPECT -MustSurvive $survive
+          $code = $LASTEXITCODE
           node --version; npm --version; git --version; python --version
-          cowsay "Lindo non ha rotto nulla" 
-          if ($LASTEXITCODE -ne 0) { throw "npm globale non funziona più" }
+          cowsay "Lindo non ha rotto nulla"
+          if ($LASTEXITCODE -ne 0) { Write-Host "npm globale non funziona più"; $code++ }
+          exit $code
 
       - name: Disinstalla l'MSI
         shell: pwsh
@@ -168,6 +166,7 @@ jobs:
             uninstall.txt
             install.log
             docs/screenshots/*.png
+            docs/test-robot/*
 
       - name: Salva le schermate nel repository
         if: always() && github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')
@@ -175,7 +174,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/screenshots/*.png
+          git add docs/screenshots/*.png docs/test-robot
           if git diff --cached --quiet; then echo "Nessuna schermata nuova"; exit 0; fi
           git commit -m "Aggiorna le schermate del README [skip ci]"
           git pull --rebase origin "${GITHUB_REF_NAME}"

@@ -31,6 +31,7 @@
                     </Grid.ColumnDefinitions>
 
                     <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center" Click="OnAppCheckClick"
+                              AutomationProperties.Name="{Binding Name, StringFormat='Seleziona {0}'}"
                               IsEnabled="{Binding CanUninstall}" ToolTip="Seleziona per disinstallare più app insieme"/>
 
                     <Grid Grid.Column="1" Width="40" Height="40" VerticalAlignment="Center">
@@ -91,6 +92,7 @@
                         </StackPanel>
                     </Border>
                     <Button Grid.Column="5" Style="{StaticResource RowUninstallButton}" Click="OnUninstallClick" Tag="{Binding}"
+                            AutomationProperties.Name="{Binding Name, StringFormat='Disinstalla {0}'}"
                             VerticalAlignment="Center" Visibility="{Binding CanUninstall, Converter={StaticResource BoolToVis}}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
@@ -118,7 +120,7 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" VerticalAlignment="Center"/>
+                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" VerticalAlignment="Center" AutomationProperties.Name="{Binding Path}"/>
                     <Border Grid.Column="1" Width="34" Height="34" CornerRadius="9" Background="#14FFFFFF" Margin="12,0,12,0">
                         <TextBlock Text="{Binding Glyph}" Style="{StaticResource Glyph}" FontSize="15" Foreground="{StaticResource Subtle}"/>
                     </Border>
@@ -356,7 +358,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button Style="{StaticResource GhostButton}" Content="Deseleziona" Click="OnClearAppSelection" Margin="0,0,8,0"/>
-                                <Button Style="{StaticResource DangerButton}" Click="OnUninstallSelected">
+                                <Button x:Name="UninstallSelectedButton" Style="{StaticResource DangerButton}" Click="OnUninstallSelected" AutomationProperties.Name="Disinstalla selezionate">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                         <TextBlock Text="Disinstalla selezionate"/>
@@ -400,7 +402,7 @@
                         <TextBlock Text="Cerca le cartelle rimaste da programmi già disinstallati e le voci “fantasma” che restano nell'elenco delle app."
                                    Style="{StaticResource SubtleText}" Margin="0,4,0,0"/>
                     </StackPanel>
-                    <Button x:Name="ScanOrphansButton" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PrimaryButton}" Click="OnScanOrphansClick">
+                    <Button x:Name="ScanOrphansButton" AutomationProperties.Name="Analizza il sistema" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PrimaryButton}" Click="OnScanOrphansClick">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE721;" FontFamily="{StaticResource Icons}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
                             <TextBlock x:Name="ScanOrphansText" Text="Analizza il sistema"/>
@@ -472,7 +474,7 @@
                             <CheckBox x:Name="OrphansSelectAll" Content="Seleziona tutti i sicuri" Click="OnOrphansSelectAll" Foreground="{StaticResource Subtle}"/>
                             <TextBlock x:Name="OrphansSelection" Text="" Foreground="{StaticResource Subtle}" Margin="24,0,0,0" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <Button x:Name="DeleteOrphansButton" HorizontalAlignment="Right" Style="{StaticResource DangerButton}" Click="OnDeleteOrphansClick">
+                        <Button x:Name="DeleteOrphansButton" AutomationProperties.Name="Elimina residui selezionati" HorizontalAlignment="Right" Style="{StaticResource DangerButton}" Click="OnDeleteOrphansClick">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                 <TextBlock Text="Elimina selezionati"/>
@@ -508,7 +510,7 @@
                             <TextBlock x:Name="CleanTotal" Text="Calcolo…" FontFamily="{StaticResource DisplayFont}" FontSize="38" FontWeight="Bold" Margin="0,2,0,0"/>
                             <TextBlock x:Name="CleanStatus" Text="Seleziona cosa pulire e premi “Pulisci ora”." Foreground="{StaticResource Subtle}" FontSize="12.5"/>
                         </StackPanel>
-                        <Button x:Name="CleanButton" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PrimaryButton}"
+                        <Button x:Name="CleanButton" AutomationProperties.Name="Pulisci ora" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PrimaryButton}"
                                 Padding="26,13" FontSize="15" Click="OnQuickCleanClick">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE945;" FontFamily="{StaticResource Icons}" FontSize="15" VerticalAlignment="Center" Margin="0,0,10,0"/>
@@ -620,6 +622,7 @@
                                             <TextBlock Text="{Binding UsageText}" Foreground="{StaticResource Faint}" FontSize="11.5" HorizontalAlignment="Right" Margin="0,2,0,0"/>
                                         </StackPanel>
                                         <ToggleButton Grid.Column="3" Style="{StaticResource Switch}" IsChecked="{Binding Enabled, Mode=OneWay}" Tag="{Binding}"
+                                                      AutomationProperties.Name="{Binding Name, StringFormat='Avvio {0}'}"
                                                       Click="OnStartupToggle" VerticalAlignment="Center" ToolTip="Avvia con Windows"/>
                                     </Grid>
                                 </Border>
@@ -761,7 +764,7 @@
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <Button x:Name="RestoreButton" Style="{StaticResource GhostButton}" Content="Ripristina tutto" Margin="0,0,10,0" Click="OnOptimizeRestore"/>
-                            <Button x:Name="OptimizeButton" Style="{StaticResource PrimaryButton}" Padding="26,13" FontSize="15" Click="OnOptimizeClick">
+                            <Button x:Name="OptimizeButton" AutomationProperties.Name="Ottimizza ora" Style="{StaticResource PrimaryButton}" Padding="26,13" FontSize="15" Click="OnOptimizeClick">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE945;" FontFamily="{StaticResource Icons}" FontSize="15" VerticalAlignment="Center" Margin="0,0,10,0"/>
                                     <TextBlock Text="Ottimizza ora"/>
@@ -992,7 +995,7 @@
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,28,0,0">
                             <Button Style="{StaticResource GhostButton}" Content="Annulla" Click="OnDialogCancel" Margin="0,0,10,0"/>
-                            <Button x:Name="DlgConfirmButton" Style="{StaticResource DangerButton}" Click="OnConfirmUninstall" Padding="22,10">
+                            <Button x:Name="DlgConfirmButton" AutomationProperties.Name="Conferma" Style="{StaticResource DangerButton}" Click="OnConfirmUninstall" Padding="22,10">
                                 <TextBlock x:Name="DlgConfirmText" Text="Disinstalla"/>
                             </Button>
                         </StackPanel>
@@ -1036,7 +1039,7 @@
                             <CheckBox x:Name="DlgSelectAll" Content="Seleziona tutto" Foreground="{StaticResource Subtle}" Click="OnDlgSelectAll" VerticalAlignment="Center"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button Style="{StaticResource GhostButton}" Content="Salta" Click="OnSkipLeftovers" Margin="0,0,10,0"/>
-                                <Button x:Name="DlgDeleteButton" Style="{StaticResource DangerButton}" Click="OnDeleteLeftovers" Padding="22,10">
+                                <Button x:Name="DlgDeleteButton" AutomationProperties.Name="Elimina selezionati" Style="{StaticResource DangerButton}" Click="OnDeleteLeftovers" Padding="22,10">
                                     <TextBlock x:Name="DlgDeleteText" Text="Elimina selezionati"/>
                                 </Button>
                             </StackPanel>
