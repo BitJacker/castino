@@ -29,7 +29,7 @@ namespace Lindo.Services
             var ev = new OrphanEvidence { RecentDays = recentDays, NewestActivity = NewestWrite };
 
             // Variabili d'ambiente (utente e sistema): PATH, ANDROID_HOME, JAVA_HOME, NVM_HOME…
-            foreach (var target in new[] { EnvironmentVariableTarget.Machine, EnvironmentVariableTarget.User, EnvironmentVariableTarget.Process })
+            foreach (var target in new[] { EnvironmentVariableTarget.Machine, EnvironmentVariableTarget.User })
             {
                 try
                 {
