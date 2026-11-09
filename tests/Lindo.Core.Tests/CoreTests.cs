@@ -304,7 +304,7 @@ namespace Lindo.Core.Tests
         {
             Assert.Equal("—", SizeFormat.Format(0));
             Assert.Equal("512 B", SizeFormat.Format(512));
-            Assert.Equal("1,5 KB", SizeFormat.Format(1536));
+            Assert.Equal("1.5 KB", SizeFormat.Format(1536));
             Assert.Equal("1 GB", SizeFormat.Format(1024L * 1024 * 1024));
         }
     }

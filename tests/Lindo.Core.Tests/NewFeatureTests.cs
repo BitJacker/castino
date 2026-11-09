@@ -128,14 +128,14 @@ EPSON=""EPSON""
         }
 
         [Fact]
-        public void TimeTextItalian()
+        public void TimeTextEnglish()
         {
             var now = new DateTime(2026, 11, 9);
-            Assert.Equal("oggi", TimeText.Ago(now, now));
-            Assert.Equal("ieri", TimeText.Ago(now.AddDays(-1), now));
-            Assert.Equal("5 giorni fa", TimeText.Ago(now.AddDays(-5), now));
-            Assert.Equal("3 mesi fa", TimeText.Ago(now.AddDays(-95), now));
-            Assert.Equal("2 anni fa", TimeText.Ago(now.AddDays(-800), now));
+            Assert.Equal("today", TimeText.Ago(now, now));
+            Assert.Equal("yesterday", TimeText.Ago(now.AddDays(-1), now));
+            Assert.Equal("5 days ago", TimeText.Ago(now.AddDays(-5), now));
+            Assert.Equal("3 months ago", TimeText.Ago(now.AddDays(-95), now));
+            Assert.Equal("2 years ago", TimeText.Ago(now.AddDays(-800), now));
         }
     }
 
@@ -204,7 +204,7 @@ EPSON=""EPSON""
         [Fact]
         public void ExplainsCommonCrashes()
         {
-            Assert.Contains("memoria", CrashExplainer.ExplainException("0xc0000005"));
+            Assert.Contains("memory", CrashExplainer.ExplainException("0xc0000005"));
             Assert.Contains(".NET", CrashExplainer.ExplainException("e0434352"));
             Assert.Contains("0x12345678", CrashExplainer.ExplainException("0x12345678"));
             Assert.Contains("NVIDIA", CrashExplainer.ExplainModule("nvwgf2umx.dll"));

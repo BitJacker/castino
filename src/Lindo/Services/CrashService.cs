@@ -50,11 +50,11 @@ namespace Lindo.Services
                     {
                         Add("hang|" + app, () => new CrashGroup
                         {
-                            Kind = "Blocco",
-                            Title = app + " non rispondeva",
-                            Explanation = "Il programma si è bloccato ed è stato chiuso (da te o da Windows).",
-                            Advice = "Se succede spesso: aggiorna il programma, chiudi le app pesanti in background e controlla lo spazio libero su disco.",
-                            Details = "Versione " + P(1),
+                            Kind = "Hang",
+                            Title = app + " stopped responding",
+                            Explanation = "The program froze and was closed (by you or by Windows).",
+                            Advice = "If it happens often: update the program, close heavy background apps and check your free disk space.",
+                            Details = "Version " + P(1),
                         }, when);
                         continue;
                     }
@@ -67,10 +67,10 @@ namespace Lindo.Services
                         return new CrashGroup
                         {
                             Kind = "App",
-                            Title = app + " si è chiuso all'improvviso",
+                            Title = app + " closed unexpectedly",
                             Explanation = CrashExplainer.ExplainException(code),
-                            Advice = hint ?? "Aggiorna il programma all'ultima versione; se continua, reinstallalo.",
-                            Details = "Modulo: " + (string.IsNullOrEmpty(module) ? "?" : module) + "  ·  codice 0x" + code.Replace("0x", "") +
+                            Advice = hint ?? "Update the program to the latest version; if it keeps happening, reinstall it.",
+                            Details = "Module: " + (string.IsNullOrEmpty(module) ? "?" : module) + "  ·  code 0x" + code.Replace("0x", "") +
                                       (string.IsNullOrEmpty(path) ? "" : "  ·  " + path),
                         };
                     }, when);
@@ -88,10 +88,10 @@ namespace Lindo.Services
                     var (name, hint) = CrashExplainer.ExplainBugCheck(code);
                     Add("bsod|" + code, () => new CrashGroup
                     {
-                        Kind = "Schermata blu",
+                        Kind = "Blue screen",
                         IsSystem = true,
-                        Title = "Schermata blu: " + name,
-                        Explanation = "Windows si è fermato e il PC è ripartito per un errore grave.",
+                        Title = "Blue screen: " + name,
+                        Explanation = "Windows stopped and the PC restarted because of a serious error.",
                         Advice = hint,
                         Details = text ?? "",
                     }, r.TimeCreated ?? DateTime.Now);
@@ -109,11 +109,11 @@ namespace Lindo.Services
                     if (bug != 0) continue; // c'è già la schermata blu corrispondente
                     Add("power", () => new CrashGroup
                     {
-                        Kind = "Spegnimento",
+                        Kind = "Shutdown",
                         IsSystem = true,
-                        Title = "Il PC si è spento senza chiudere Windows",
-                        Explanation = "Il computer si è spento o riavviato all'improvviso, senza una schermata blu.",
-                        Advice = "Di solito è mancanza di corrente, il tasto di accensione tenuto premuto, batteria scarica o surriscaldamento. Se succede da solo, controlla temperature e alimentatore.",
+                        Title = "The PC turned off without shutting down Windows",
+                        Explanation = "The computer turned off or restarted suddenly, without a blue screen.",
+                        Advice = "Usually a power cut, the power button held down, a flat battery or overheating. If it happens on its own, check temperatures and the power supply.",
                         Details = "",
                     }, r.TimeCreated ?? DateTime.Now);
                 }
@@ -141,14 +141,14 @@ namespace Lindo.Services
         {
             var path = Path.Combine(SystemInfo.DataFolder, "rapporto-crash-" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".txt");
             var sb = new StringBuilder();
-            sb.AppendLine("Rapporto crash di Lindo - " + DateTime.Now);
+            sb.AppendLine("Lindo crash report - " + DateTime.Now);
             sb.AppendLine();
             foreach (var g in groups)
             {
-                sb.AppendLine($"[{g.Kind}] {g.Title}  ({g.Count} volte, ultima: {g.Last:g})");
-                sb.AppendLine("  Cosa è successo: " + g.Explanation);
-                sb.AppendLine("  Cosa fare: " + g.Advice);
-                if (!string.IsNullOrEmpty(g.Details)) sb.AppendLine("  Dettagli: " + g.Details);
+                sb.AppendLine($"[{g.Kind}] {g.Title}  ({g.Count} times, last: {g.Last:g})");
+                sb.AppendLine("  What happened: " + g.Explanation);
+                sb.AppendLine("  What to do: " + g.Advice);
+                if (!string.IsNullOrEmpty(g.Details)) sb.AppendLine("  Details: " + g.Details);
                 sb.AppendLine();
             }
             File.WriteAllText(path, sb.ToString(), Encoding.UTF8);

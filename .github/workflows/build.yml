@@ -27,7 +27,7 @@ jobs:
       - name: Versione
         id: ver
         run: |
-          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"; else echo "version=1.1.1" >> "$GITHUB_OUTPUT"; fi
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"; else echo "version=1.2.0" >> "$GITHUB_OUTPUT"; fi
 
       - name: Test + build
         env:
@@ -208,14 +208,14 @@ jobs:
           name: Lindo ${{ steps.ver.outputs.version }}
           make_latest: "true"
           body: |
-            **Scarica uno dei due file qui sotto (sezione Assets):**
+            **Download one of the files below (Assets section):**
 
-            - `Lindo-${{ steps.ver.outputs.version }}.msi`: installazione classica (menu Start, Desktop, compare tra le app installate).
-            - `Lindo-${{ steps.ver.outputs.version }}-portatile.zip`: versione portatile completa (con il monitor in background).
-            - `Lindo.exe`: solo l'app, senza il monitor in background.
+            - `Lindo-${{ steps.ver.outputs.version }}.msi`: classic install (Start menu, Desktop, shows up in installed apps).
+            - `Lindo-${{ steps.ver.outputs.version }}-portable.zip`: full portable version (with the background monitor).
+            - `Lindo.exe`: just the app, without the background monitor.
 
-            Requisiti: Windows 10 (1903 o successivo) o Windows 11. Se compare "PC protetto da Windows",
-            clicca *Ulteriori informazioni → Esegui comunque* (l'eseguibile non è firmato digitalmente).
+            Requirements: Windows 10 (1903 or later) or Windows 11. If you see "Windows protected your PC",
+            click *More info → Run anyway* (the executable isn't digitally signed).
           files: |
             dist/*.msi
             dist/*.zip

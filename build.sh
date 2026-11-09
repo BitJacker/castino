@@ -3,7 +3,7 @@
 # Requisiti: .NET SDK 8 (Microsoft, con il supporto WindowsDesktop) e wixl (pacchetto "wixl" / msitools).
 set -euo pipefail
 cd "$(dirname "$0")"
-VERSION="${VERSION:-1.1.1}"
+VERSION="${VERSION:-1.2.0}"
 
 dotnet test tests/Lindo.Core.Tests -c Release
 dotnet build src/Lindo -c Release -p:Version="$VERSION"
@@ -19,7 +19,7 @@ ls -la dist
 python3 - "$VERSION" <<'PY'
 import sys, zipfile
 v = sys.argv[1]
-with zipfile.ZipFile(f"dist/Lindo-{v}-portatile.zip", "w", zipfile.ZIP_DEFLATED) as z:
+with zipfile.ZipFile(f"dist/Lindo-{v}-portable.zip", "w", zipfile.ZIP_DEFLATED) as z:
     for f in ["Lindo.exe", "Lindo.exe.config", "LindoMonitor.exe"]:
         z.write(f"dist/{f}", f)
 PY

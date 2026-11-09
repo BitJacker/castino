@@ -198,19 +198,19 @@ namespace Lindo.Core
 
     public static class TimeText
     {
-        private static readonly CultureInfo It = CultureInfo.GetCultureInfo("it-IT");
+        private static readonly CultureInfo It = CultureInfo.GetCultureInfo("en-US");
 
-        /// <summary>"oggi", "ieri", "5 giorni fa", "3 mesi fa", "1 anno fa".</summary>
+        /// <summary>"today", "yesterday", "5 giorni fa", "3 mesi fa", "1 anno fa".</summary>
         public static string Ago(DateTime when, DateTime now)
         {
             var days = (now.Date - when.Date).TotalDays;
-            if (days < 1) return "oggi";
-            if (days < 2) return "ieri";
-            if (days < 30) return (int)days + " giorni fa";
+            if (days < 1) return "today";
+            if (days < 2) return "yesterday";
+            if (days < 30) return (int)days + " days ago";
             var months = (int)(days / 30.4);
-            if (months < 12) return months == 1 ? "1 mese fa" : months + " mesi fa";
+            if (months < 12) return months == 1 ? "1 month ago" : months + " months ago";
             var years = (int)(days / 365.25);
-            return years <= 1 ? "1 anno fa" : years + " anni fa";
+            return years <= 1 ? "1 year ago" : years + " years ago";
         }
 
         public static string Duration(long seconds)
@@ -219,7 +219,7 @@ namespace Lindo.Core
             var m = seconds / 60;
             if (m < 60) return m + " min";
             var h = m / 60;
-            return h < 48 ? h + " h " + (m % 60) + " min" : (h / 24) + " giorni";
+            return h < 48 ? h + " h " + (m % 60) + " min" : (h / 24) + " days";
         }
     }
 }

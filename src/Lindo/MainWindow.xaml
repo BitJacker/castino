@@ -31,8 +31,8 @@
                     </Grid.ColumnDefinitions>
 
                     <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center" Checked="OnAppCheckClick" Unchecked="OnAppCheckClick"
-                              AutomationProperties.Name="{Binding Name, StringFormat='Seleziona {0}'}"
-                              IsEnabled="{Binding CanUninstall}" ToolTip="Seleziona per disinstallare più app insieme"/>
+                              AutomationProperties.Name="{Binding Name, StringFormat='Select {0}'}"
+                              IsEnabled="{Binding CanUninstall}" ToolTip="Select to uninstall several apps at once"/>
 
                     <Grid Grid.Column="1" Width="40" Height="40" VerticalAlignment="Center">
                         <Border CornerRadius="11" Background="{Binding AvatarBrush}">
@@ -49,7 +49,7 @@
                         <DockPanel LastChildFill="True">
                             <Border DockPanel.Dock="Right" CornerRadius="6" Background="{StaticResource WarningSoft}" Padding="6,1" Margin="8,0,0,0"
                                     VerticalAlignment="Center" Visibility="{Binding IsUnused, Converter={StaticResource BoolToVis}}">
-                                <TextBlock Text="Non usata" FontSize="11" Foreground="{StaticResource Warning}" FontWeight="SemiBold"/>
+                                <TextBlock Text="Unused" FontSize="11" Foreground="{StaticResource Warning}" FontWeight="SemiBold"/>
                             </Border>
                             <Border DockPanel.Dock="Right" CornerRadius="6" Background="#2222D3EE" Padding="6,1" Margin="8,0,0,0"
                                     VerticalAlignment="Center" Visibility="{Binding IsDriver, Converter={StaticResource BoolToVis}}">
@@ -85,18 +85,18 @@
 
                     <Border Grid.Column="5" CornerRadius="10" Background="#14FFFFFF" Padding="14,7" VerticalAlignment="Center"
                             Visibility="{Binding CanUninstall, Converter={StaticResource NotVis}}"
-                            ToolTip="Driver indispensabile (video, rete, disco, audio…): Lindo non lo rimuove">
+                            ToolTip="Essential driver (graphics, network, disk, audio…): Lindo won't remove it">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE72E;" FontFamily="{StaticResource Icons}" FontSize="13" Foreground="{StaticResource Faint}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <TextBlock Text="Protetto" Foreground="{StaticResource Faint}" FontSize="12.5" FontWeight="SemiBold"/>
+                            <TextBlock Text="Protected" Foreground="{StaticResource Faint}" FontSize="12.5" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Border>
                     <Button Grid.Column="5" Style="{StaticResource RowUninstallButton}" Click="OnUninstallClick" Tag="{Binding}"
-                            AutomationProperties.Name="{Binding Name, StringFormat='Disinstalla {0}'}"
+                            AutomationProperties.Name="{Binding Name, StringFormat='Uninstall {0}'}"
                             VerticalAlignment="Center" Visibility="{Binding CanUninstall, Converter={StaticResource BoolToVis}}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <TextBlock Text="Disinstalla" VerticalAlignment="Center"/>
+                            <TextBlock Text="Uninstall" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </Grid>
@@ -140,7 +140,7 @@
                         <TextBlock Text="{Binding DateText}" Foreground="{StaticResource Faint}" FontSize="11.5" HorizontalAlignment="Right" Margin="0,3,0,0"/>
                     </StackPanel>
                     <Button Grid.Column="4" Style="{StaticResource GhostButton}" Padding="10,6" Click="OnOpenLeftoverClick" Tag="{Binding}"
-                            ToolTip="Mostra in Esplora file">
+                            ToolTip="Show in File Explorer">
                         <TextBlock Text="&#xE838;" FontFamily="{StaticResource Icons}" FontSize="14"/>
                     </Button>
                 </Grid>
@@ -179,30 +179,30 @@
                     <Image Source="pack://application:,,,/Assets/logo.png" Width="38" Height="38" RenderOptions.BitmapScalingMode="HighQuality"/>
                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="Lindo" FontFamily="{StaticResource DisplayFont}" FontSize="20" FontWeight="Bold"/>
-                        <TextBlock Text="Disinstalla senza residui" Foreground="{StaticResource Faint}" FontSize="11.5"/>
+                        <TextBlock Text="Uninstall without leftovers" Foreground="{StaticResource Faint}" FontSize="11.5"/>
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Row="1">
                     <TextBlock Text="MENU" Foreground="{StaticResource Faint}" FontSize="11" FontWeight="SemiBold" Margin="16,0,0,8"/>
-                    <RadioButton x:Name="NavApps" Style="{StaticResource NavButton}" Tag="&#xE71D;" Content="Applicazioni" IsChecked="True" Checked="OnNavChanged"/>
-                    <RadioButton x:Name="NavLeftovers" Style="{StaticResource NavButton}" Tag="&#xE8B7;" Content="Residui e verifica" Checked="OnNavChanged"/>
-                    <RadioButton x:Name="NavClean" Style="{StaticResource NavButton}" Tag="&#xE945;" Content="Pulizia rapida" Checked="OnNavChanged"/>
-                    <RadioButton x:Name="NavStartup" Style="{StaticResource NavButton}" Tag="&#xE7E8;" Content="Avvio e attività" Checked="OnNavChanged"/>
-                    <RadioButton x:Name="NavOptimize" Style="{StaticResource NavButton}" Tag="&#xE9D9;" Content="Ottimizza" Checked="OnNavChanged"/>
-                    <RadioButton x:Name="NavCrashes" Style="{StaticResource NavButton}" Tag="&#xE7BA;" Content="Errori e crash" Checked="OnNavChanged"/>
+                    <RadioButton x:Name="NavApps" Style="{StaticResource NavButton}" Tag="&#xE71D;" Content="Apps" IsChecked="True" Checked="OnNavChanged"/>
+                    <RadioButton x:Name="NavLeftovers" Style="{StaticResource NavButton}" Tag="&#xE8B7;" Content="Leftovers" Checked="OnNavChanged"/>
+                    <RadioButton x:Name="NavClean" Style="{StaticResource NavButton}" Tag="&#xE945;" Content="Quick clean" Checked="OnNavChanged"/>
+                    <RadioButton x:Name="NavStartup" Style="{StaticResource NavButton}" Tag="&#xE7E8;" Content="Startup &amp; activity" Checked="OnNavChanged"/>
+                    <RadioButton x:Name="NavOptimize" Style="{StaticResource NavButton}" Tag="&#xE9D9;" Content="Optimize" Checked="OnNavChanged"/>
+                    <RadioButton x:Name="NavCrashes" Style="{StaticResource NavButton}" Tag="&#xE7BA;" Content="Errors &amp; crashes" Checked="OnNavChanged"/>
                 </StackPanel>
 
                 <!-- Dischi -->
                 <StackPanel Grid.Row="3">
-                    <TextBlock Text="DISCHI" Foreground="{StaticResource Faint}" FontSize="11" FontWeight="SemiBold" Margin="16,0,0,8"/>
+                    <TextBlock Text="DRIVES" Foreground="{StaticResource Faint}" FontSize="11" FontWeight="SemiBold" Margin="16,0,0,8"/>
                     <ScrollViewer MaxHeight="250" VerticalScrollBarVisibility="Auto">
                         <ItemsControl x:Name="DrivesList">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border x:Name="card" CornerRadius="12" Padding="12,9" Margin="0,0,0,6" Background="#171B25"
                                             BorderBrush="{StaticResource Border}" BorderThickness="1" Cursor="Hand"
-                                            MouseLeftButtonUp="OnDriveClick" Tag="{Binding}" ToolTip="Mostra solo le app di questo disco">
+                                            MouseLeftButtonUp="OnDriveClick" Tag="{Binding}" ToolTip="Show only the apps on this drive">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto"/>
@@ -255,9 +255,9 @@
             <!-- Barra del titolo -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"
                         shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                <Button Style="{StaticResource CaptionButton}" Content="&#xE921;" Click="OnMinimize" ToolTip="Riduci a icona"/>
-                <Button x:Name="MaxButton" Style="{StaticResource CaptionButton}" Content="&#xE922;" Click="OnMaximize" ToolTip="Ingrandisci"/>
-                <Button Style="{StaticResource CloseCaptionButton}" Content="&#xE8BB;" Click="OnClose" ToolTip="Chiudi"/>
+                <Button Style="{StaticResource CaptionButton}" Content="&#xE921;" Click="OnMinimize" ToolTip="Minimize"/>
+                <Button x:Name="MaxButton" Style="{StaticResource CaptionButton}" Content="&#xE922;" Click="OnMaximize" ToolTip="Maximize"/>
+                <Button Style="{StaticResource CloseCaptionButton}" Content="&#xE8BB;" Click="OnClose" ToolTip="Close"/>
             </StackPanel>
 
             <!-- ===== Pagina: Applicazioni ===== -->
@@ -271,13 +271,13 @@
 
                 <Grid Margin="0,0,0,18">
                     <StackPanel>
-                        <TextBlock Text="Applicazioni installate" Style="{StaticResource H1}"/>
-                        <TextBlock x:Name="AppsSummary" Text="Analisi in corso…" Style="{StaticResource SubtleText}" Margin="0,4,0,0"/>
+                        <TextBlock Text="Installed apps" Style="{StaticResource H1}"/>
+                        <TextBlock x:Name="AppsSummary" Text="Scanning…" Style="{StaticResource SubtleText}" Margin="0,4,0,0"/>
                     </StackPanel>
                     <Button HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource BaseButton}" Click="OnRefreshClick">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE72C;" FontFamily="{StaticResource Icons}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <TextBlock Text="Aggiorna"/>
+                            <TextBlock Text="Refresh"/>
                         </StackPanel>
                     </Button>
                 </Grid>
@@ -293,19 +293,19 @@
                     </Grid.ColumnDefinitions>
                     <Border CornerRadius="16" Padding="18,14" Background="{StaticResource Card}">
                         <StackPanel>
-                            <TextBlock Text="App installate" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
+                            <TextBlock Text="Installed apps" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
                             <TextBlock x:Name="StatCount" Text="—" FontFamily="{StaticResource DisplayFont}" FontSize="26" FontWeight="Bold" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Border>
                     <Border Grid.Column="2" CornerRadius="16" Padding="18,14" Background="{StaticResource Card}">
                         <StackPanel>
-                            <TextBlock Text="Spazio occupato dalle app" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
+                            <TextBlock Text="Space used by apps" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
                             <TextBlock x:Name="StatSize" Text="—" FontFamily="{StaticResource DisplayFont}" FontSize="26" FontWeight="Bold" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Border>
                     <Border Grid.Column="4" CornerRadius="16" Padding="18,14" Background="{StaticResource Card}">
                         <StackPanel>
-                            <TextBlock Text="L'app più pesante" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
+                            <TextBlock Text="Largest app" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
                             <TextBlock x:Name="StatBiggest" Text="—" FontFamily="{StaticResource DisplayFont}" FontSize="18" FontWeight="Bold"
                                        Margin="0,6,0,0" TextTrimming="CharacterEllipsis"/>
                             <TextBlock x:Name="StatBiggestSize" Text="" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
@@ -321,24 +321,24 @@
                             <ColumnDefinition Width="160"/>
                             <ColumnDefinition Width="200"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox x:Name="SearchBox" Style="{StaticResource SearchBox}" Tag="Cerca un'app, un editore o un driver…" TextChanged="OnSearchChanged"/>
+                        <TextBox x:Name="SearchBox" Style="{StaticResource SearchBox}" Tag="Search for an app, publisher or driver…" TextChanged="OnSearchChanged"/>
                         <ComboBox x:Name="DriveBox" Grid.Column="1" Style="{StaticResource DarkCombo}" Margin="12,0,0,0" SelectionChanged="OnDriveFilterChanged"/>
                         <ComboBox x:Name="SortBox" Grid.Column="2" Style="{StaticResource DarkCombo}" Margin="12,0,0,0" SelectedIndex="0" SelectionChanged="OnSortChanged">
-                            <ComboBoxItem Content="Più pesanti prima"/>
-                            <ComboBoxItem Content="Nome (A-Z)"/>
-                            <ComboBoxItem Content="Installate di recente"/>
-                            <ComboBoxItem Content="Meno usate prima"/>
+                            <ComboBoxItem Content="Largest first"/>
+                            <ComboBoxItem Content="Name (A-Z)"/>
+                            <ComboBoxItem Content="Recently installed"/>
+                            <ComboBoxItem Content="Least used first"/>
                         </ComboBox>
                     </Grid>
                     <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-                        <RadioButton x:Name="FilterAll" Style="{StaticResource Chip}" Content="Tutte" IsChecked="True" GroupName="flt" Checked="OnFilterChanged"/>
-                        <RadioButton x:Name="FilterDesktop" Style="{StaticResource Chip}" Content="Programmi" GroupName="flt" Checked="OnFilterChanged"/>
+                        <RadioButton x:Name="FilterAll" Style="{StaticResource Chip}" Content="All" IsChecked="True" GroupName="flt" Checked="OnFilterChanged"/>
+                        <RadioButton x:Name="FilterDesktop" Style="{StaticResource Chip}" Content="Programs" GroupName="flt" Checked="OnFilterChanged"/>
                         <RadioButton x:Name="FilterStore" Style="{StaticResource Chip}" Content="Store" GroupName="flt" Checked="OnFilterChanged"/>
                         <RadioButton x:Name="FilterDrivers" Style="{StaticResource Chip}" Content="Driver" GroupName="flt" Checked="OnFilterChanged"/>
                         <RadioButton x:Name="FilterUnused" Style="{StaticResource Chip}" GroupName="flt" Checked="OnFilterChanged">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE823;" FontFamily="{StaticResource Icons}" FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                <TextBlock x:Name="FilterUnusedText" Text="Non usate"/>
+                                <TextBlock x:Name="FilterUnusedText" Text="Unused"/>
                             </StackPanel>
                         </RadioButton>
                     </StackPanel>
@@ -357,11 +357,11 @@
                                 <TextBlock x:Name="AppsSelectionText" FontWeight="SemiBold" VerticalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button Style="{StaticResource GhostButton}" Content="Deseleziona" Click="OnClearAppSelection" Margin="0,0,8,0"/>
-                                <Button x:Name="UninstallSelectedButton" Style="{StaticResource DangerButton}" Click="OnUninstallSelected" AutomationProperties.Name="Disinstalla selezionate">
+                                <Button Style="{StaticResource GhostButton}" Content="Clear selection" Click="OnClearAppSelection" Margin="0,0,8,0"/>
+                                <Button x:Name="UninstallSelectedButton" Style="{StaticResource DangerButton}" Click="OnUninstallSelected" AutomationProperties.Name="Uninstall selected">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                        <TextBlock Text="Disinstalla selezionate"/>
+                                        <TextBlock Text="Uninstall selected"/>
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
@@ -376,13 +376,13 @@
                             <Path Stroke="{StaticResource Accent}" StrokeThickness="5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                   Data="M 26,2.5 A 23.5,23.5 0 0 1 49.5,26"/>
                         </Grid>
-                        <TextBlock Text="Sto cercando le app installate…" Foreground="{StaticResource Subtle}" Margin="0,16,0,0" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Looking for installed apps…" Foreground="{StaticResource Subtle}" Margin="0,16,0,0" HorizontalAlignment="Center"/>
                     </StackPanel>
 
                     <!-- Stato: nessun risultato -->
                     <StackPanel x:Name="AppsEmpty" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
                         <TextBlock Text="&#xE721;" Style="{StaticResource Glyph}" FontSize="34" Foreground="{StaticResource Faint}"/>
-                        <TextBlock Text="Nessuna app corrisponde alla ricerca" Foreground="{StaticResource Subtle}" Margin="0,14,0,0"/>
+                        <TextBlock Text="No app matches your search" Foreground="{StaticResource Subtle}" Margin="0,14,0,0"/>
                     </StackPanel>
                 </Grid>
             </Grid>
@@ -398,14 +398,14 @@
 
                 <Grid Margin="0,0,0,18">
                     <StackPanel Margin="0,0,200,0">
-                        <TextBlock Text="Residui e verifica" Style="{StaticResource H1}"/>
-                        <TextBlock Text="Cerca le cartelle rimaste da programmi già disinstallati e le voci “fantasma” che restano nell'elenco delle app."
+                        <TextBlock Text="Leftovers" Style="{StaticResource H1}"/>
+                        <TextBlock Text="Finds folders left behind by programs you already uninstalled, and “ghost” entries that stay in the app list."
                                    Style="{StaticResource SubtleText}" Margin="0,4,0,0"/>
                     </StackPanel>
-                    <Button x:Name="ScanOrphansButton" AutomationProperties.Name="Analizza il sistema" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PrimaryButton}" Click="OnScanOrphansClick">
+                    <Button x:Name="ScanOrphansButton" AutomationProperties.Name="Scan the system" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PrimaryButton}" Click="OnScanOrphansClick">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE721;" FontFamily="{StaticResource Icons}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <TextBlock x:Name="ScanOrphansText" Text="Analizza il sistema"/>
+                            <TextBlock x:Name="ScanOrphansText" Text="Scan the system"/>
                         </StackPanel>
                     </Button>
                 </Grid>
@@ -414,7 +414,7 @@
                     <DockPanel>
                         <TextBlock DockPanel.Dock="Left" Text="&#xE7BA;" Style="{StaticResource Glyph}" Foreground="{StaticResource Warning}" Margin="0,0,10,0"/>
                         <TextBlock TextWrapping="Wrap" Foreground="#F5D98B" FontSize="12.5"
-                                   Text="«Sicuri da eliminare»: nessun programma installato, in esecuzione, nel PATH, nei servizi, all'avvio o nei collegamenti li usa, e non vengono toccati da almeno 3 mesi. «Seleziona tutti i sicuri» prende solo quelli. Gli elementi «Da controllare» vanno guardati uno per uno."/>
+                                   Text="«Safe to delete»: no program that is installed, running, in the PATH, in services, at startup or in shortcuts uses them, and they haven't been touched for at least 3 months. «Select all safe» only picks those. Look at «Check first» items one by one."/>
                     </DockPanel>
                 </Border>
 
@@ -440,9 +440,9 @@
                             <Border Width="72" Height="72" CornerRadius="22" Background="{StaticResource Accent}" HorizontalAlignment="Center">
                                 <TextBlock Text="&#xE8B7;" Style="{StaticResource Glyph}" FontSize="30" Foreground="White"/>
                             </Border>
-                            <TextBlock Text="Hai già disinstallato qualcosa?" Style="{StaticResource H2}" HorizontalAlignment="Center" Margin="0,22,0,8"/>
+                            <TextBlock Text="Already uninstalled something?" Style="{StaticResource H2}" HorizontalAlignment="Center" Margin="0,22,0,8"/>
                             <TextBlock TextAlignment="Center" Style="{StaticResource SubtleText}"
-                                       Text="Lindo confronta le cartelle di Programmi, ProgramData e AppData con le app installate e ti mostra quello che è rimasto indietro, con quanto spazio occupa."/>
+                                       Text="Lindo compares the folders in Program Files, ProgramData and AppData with your installed apps and shows you what was left behind, and how much space it takes."/>
                         </StackPanel>
                     </Border>
 
@@ -453,7 +453,7 @@
                             <Path Stroke="{StaticResource Accent}" StrokeThickness="5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                   Data="M 26,2.5 A 23.5,23.5 0 0 1 49.5,26"/>
                         </Grid>
-                        <TextBlock x:Name="OrphansLoadingText" Text="Analisi delle cartelle…" Foreground="{StaticResource Subtle}" Margin="0,16,0,0" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="OrphansLoadingText" Text="Scanning folders…" Foreground="{StaticResource Subtle}" Margin="0,16,0,0" HorizontalAlignment="Center"/>
                     </StackPanel>
 
                     <Border x:Name="OrphansClean" CornerRadius="20" Background="{StaticResource Card}" Padding="40" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
@@ -461,8 +461,8 @@
                             <Border Width="72" Height="72" CornerRadius="36" Background="{StaticResource SuccessSoft}" HorizontalAlignment="Center">
                                 <TextBlock Text="&#xE73E;" Style="{StaticResource Glyph}" FontSize="30" Foreground="{StaticResource Success}"/>
                             </Border>
-                            <TextBlock Text="Tutto pulito!" Style="{StaticResource H2}" HorizontalAlignment="Center" Margin="0,20,0,6"/>
-                            <TextBlock Text="Non ho trovato residui di programmi disinstallati." Style="{StaticResource SubtleText}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="All clean!" Style="{StaticResource H2}" HorizontalAlignment="Center" Margin="0,20,0,6"/>
+                            <TextBlock Text="I found no leftovers of uninstalled programs." Style="{StaticResource SubtleText}" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -471,13 +471,13 @@
                         Padding="18,12" Margin="0,4,0,22" Visibility="Collapsed">
                     <Grid>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <CheckBox x:Name="OrphansSelectAll" Content="Seleziona tutti i sicuri" Checked="OnOrphansSelectAll" Unchecked="OnOrphansSelectAll" Foreground="{StaticResource Subtle}"/>
+                            <CheckBox x:Name="OrphansSelectAll" Content="Select all safe" Checked="OnOrphansSelectAll" Unchecked="OnOrphansSelectAll" Foreground="{StaticResource Subtle}"/>
                             <TextBlock x:Name="OrphansSelection" Text="" Foreground="{StaticResource Subtle}" Margin="24,0,0,0" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <Button x:Name="DeleteOrphansButton" AutomationProperties.Name="Elimina residui selezionati" HorizontalAlignment="Right" Style="{StaticResource DangerButton}" Click="OnDeleteOrphansClick">
+                        <Button x:Name="DeleteOrphansButton" AutomationProperties.Name="Delete selected leftovers" HorizontalAlignment="Right" Style="{StaticResource DangerButton}" Click="OnDeleteOrphansClick">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <TextBlock Text="Elimina selezionati"/>
+                                <TextBlock Text="Delete selected"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -492,8 +492,8 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <StackPanel Margin="0,0,0,18">
-                    <TextBlock Text="Pulizia rapida" Style="{StaticResource H1}"/>
-                    <TextBlock Text="File temporanei e cache che Windows e le app ricreano da soli: eliminarli è sicuro e libera spazio subito."
+                    <TextBlock Text="Quick clean" Style="{StaticResource H1}"/>
+                    <TextBlock Text="Temporary files and caches that Windows and apps recreate on their own: deleting them is safe and frees space right away."
                                Style="{StaticResource SubtleText}" Margin="0,4,0,0"/>
                 </StackPanel>
 
@@ -506,15 +506,15 @@
                     </Border.Background>
                     <Grid>
                         <StackPanel>
-                            <TextBlock Text="Spazio recuperabile" Foreground="{StaticResource Subtle}"/>
-                            <TextBlock x:Name="CleanTotal" Text="Calcolo…" FontFamily="{StaticResource DisplayFont}" FontSize="38" FontWeight="Bold" Margin="0,2,0,0"/>
-                            <TextBlock x:Name="CleanStatus" Text="Seleziona cosa pulire e premi “Pulisci ora”." Foreground="{StaticResource Subtle}" FontSize="12.5"/>
+                            <TextBlock Text="Space you can free" Foreground="{StaticResource Subtle}"/>
+                            <TextBlock x:Name="CleanTotal" Text="Calculating…" FontFamily="{StaticResource DisplayFont}" FontSize="38" FontWeight="Bold" Margin="0,2,0,0"/>
+                            <TextBlock x:Name="CleanStatus" Text="Select what to clean and press “Clean now”." Foreground="{StaticResource Subtle}" FontSize="12.5"/>
                         </StackPanel>
-                        <Button x:Name="CleanButton" AutomationProperties.Name="Pulisci ora" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PrimaryButton}"
+                        <Button x:Name="CleanButton" AutomationProperties.Name="Clean now" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PrimaryButton}"
                                 Padding="26,13" FontSize="15" Click="OnQuickCleanClick">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE945;" FontFamily="{StaticResource Icons}" FontSize="15" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                <TextBlock Text="Pulisci ora"/>
+                                <TextBlock Text="Clean now"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -567,20 +567,20 @@
                 </Grid.RowDefinitions>
                 <Grid Margin="0,0,0,16">
                     <StackPanel Margin="0,0,180,0">
-                        <TextBlock Text="Avvio e attività" Style="{StaticResource H1}"/>
-                        <TextBlock x:Name="StartupSummary" Text="Le app che partono con Windows e quanto usi (e quanto consumano) i tuoi programmi."
+                        <TextBlock Text="Startup &amp; activity" Style="{StaticResource H1}"/>
+                        <TextBlock x:Name="StartupSummary" Text="The apps that start with Windows, and how much you use your programs (and how many resources they take)."
                                    Style="{StaticResource SubtleText}" Margin="0,4,0,0"/>
                     </StackPanel>
                     <Button HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource BaseButton}" Click="OnStartupRefresh">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE72C;" FontFamily="{StaticResource Icons}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <TextBlock Text="Aggiorna"/>
+                            <TextBlock Text="Refresh"/>
                         </StackPanel>
                     </Button>
                 </Grid>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,14">
-                    <RadioButton x:Name="TabStartup" Style="{StaticResource Chip}" Content="App all'avvio" IsChecked="True" GroupName="stab" Checked="OnStartupTab"/>
-                    <RadioButton x:Name="TabUsage" Style="{StaticResource Chip}" Content="Consumo e utilizzo" GroupName="stab" Checked="OnStartupTab"/>
+                    <RadioButton x:Name="TabStartup" Style="{StaticResource Chip}" Content="Startup apps" IsChecked="True" GroupName="stab" Checked="OnStartupTab"/>
+                    <RadioButton x:Name="TabUsage" Style="{StaticResource Chip}" Content="Usage &amp; resources" GroupName="stab" Checked="OnStartupTab"/>
                 </StackPanel>
 
                 <!-- App all'avvio -->
@@ -608,10 +608,10 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="420"/>
                                                 <Border Style="{StaticResource Badge}" Background="{StaticResource WarningSoft}" Visibility="{Binding IsSuggested, Converter={StaticResource BoolToVis}}">
-                                                    <TextBlock Text="Si può togliere" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Warning}"/>
+                                                    <TextBlock Text="Can be turned off" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Warning}"/>
                                                 </Border>
                                                 <Border Style="{StaticResource Badge}" Background="{StaticResource SuccessSoft}" Visibility="{Binding IsEssential, Converter={StaticResource BoolToVis}}">
-                                                    <TextBlock Text="Consigliato tenerla" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Success}"/>
+                                                    <TextBlock Text="Better to keep" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Success}"/>
                                                 </Border>
                                             </StackPanel>
                                             <TextBlock Text="{Binding Subtitle}" Foreground="{StaticResource Subtle}" FontSize="12.5" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
@@ -622,8 +622,8 @@
                                             <TextBlock Text="{Binding UsageText}" Foreground="{StaticResource Faint}" FontSize="11.5" HorizontalAlignment="Right" Margin="0,2,0,0"/>
                                         </StackPanel>
                                         <ToggleButton Grid.Column="3" Style="{StaticResource Switch}" IsChecked="{Binding Enabled, Mode=OneWay}" Tag="{Binding}"
-                                                      AutomationProperties.Name="{Binding Name, StringFormat='Avvio {0}'}"
-                                                      Click="OnStartupToggle" VerticalAlignment="Center" ToolTip="Avvia con Windows"/>
+                                                      AutomationProperties.Name="{Binding Name, StringFormat='Startup {0}'}"
+                                                      Click="OnStartupToggle" VerticalAlignment="Center" ToolTip="Start with Windows"/>
                                     </Grid>
                                 </Border>
                                 <DataTemplate.Triggers>
@@ -640,7 +640,7 @@
                             <Ellipse Stroke="#22FFFFFF" StrokeThickness="5"/>
                             <Path Stroke="{StaticResource Accent}" StrokeThickness="5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M 26,2.5 A 23.5,23.5 0 0 1 49.5,26"/>
                         </Grid>
-                        <TextBlock Text="Leggo le app all'avvio, i servizi e le attività pianificate…" Foreground="{StaticResource Subtle}" Margin="0,16,0,0"/>
+                        <TextBlock Text="Reading startup apps, services and scheduled tasks…" Foreground="{StaticResource Subtle}" Margin="0,16,0,0"/>
                     </StackPanel>
                 </Grid>
 
@@ -664,19 +664,19 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel>
-                                <TextBlock Text="Monitoraggio in background" FontWeight="SemiBold" FontSize="15"/>
+                                <TextBlock Text="Background monitoring" FontWeight="SemiBold" FontSize="15"/>
                                 <TextBlock x:Name="MonitorStatus" Style="{StaticResource SubtleText}" Margin="0,3,0,0"
-                                           Text="Un piccolo processo (LindoMonitor) controlla ogni 30 secondi quali programmi sono aperti e quanto consumano. I dati restano sul tuo PC."/>
+                                           Text="A small process (LindoMonitor) checks every 30 seconds which programs are open and how much they use. The data stays on your PC."/>
                             </StackPanel>
                             <ToggleButton x:Name="MonitorSwitch" Grid.Column="1" Style="{StaticResource Switch}" VerticalAlignment="Center" Click="OnMonitorToggle"/>
                         </Grid>
                     </Border>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
-                        <RadioButton x:Name="UsageByCpu" Style="{StaticResource Chip}" Content="Più CPU" IsChecked="True" GroupName="usort" Checked="OnUsageSort"/>
-                        <RadioButton x:Name="UsageByMemory" Style="{StaticResource Chip}" Content="Più memoria" GroupName="usort" Checked="OnUsageSort"/>
-                        <RadioButton x:Name="UsageByTime" Style="{StaticResource Chip}" Content="Più usate" GroupName="usort" Checked="OnUsageSort"/>
+                        <RadioButton x:Name="UsageByCpu" Style="{StaticResource Chip}" Content="Most CPU" IsChecked="True" GroupName="usort" Checked="OnUsageSort"/>
+                        <RadioButton x:Name="UsageByMemory" Style="{StaticResource Chip}" Content="Most memory" GroupName="usort" Checked="OnUsageSort"/>
+                        <RadioButton x:Name="UsageByTime" Style="{StaticResource Chip}" Content="Most used" GroupName="usort" Checked="OnUsageSort"/>
                         <Button Style="{StaticResource GhostButton}" Margin="10,0,0,0" Click="OnShowUnused" Padding="12,6">
-                            <TextBlock x:Name="UnusedLink" Text="Vedi le app che non usi →" Foreground="#A99BFF"/>
+                            <TextBlock x:Name="UnusedLink" Text="See the apps you don't use →" Foreground="#A99BFF"/>
                         </Button>
                     </StackPanel>
                     <ListBox x:Name="UsageList" Grid.Row="2" Style="{StaticResource PlainList}" Margin="0,0,-10,0" Padding="0,0,10,12">
@@ -710,19 +710,19 @@
                                             </Grid>
                                         </StackPanel>
                                         <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                                            <TextBlock Text="Aperta per" Foreground="{StaticResource Faint}" FontSize="11"/>
+                                            <TextBlock Text="Open for" Foreground="{StaticResource Faint}" FontSize="11"/>
                                             <TextBlock Text="{Binding TimeText}" FontSize="12.5"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="3" VerticalAlignment="Center">
-                                            <TextBlock Text="Tempo CPU" Foreground="{StaticResource Faint}" FontSize="11"/>
+                                            <TextBlock Text="CPU time" Foreground="{StaticResource Faint}" FontSize="11"/>
                                             <TextBlock Text="{Binding CpuText}" FontSize="12.5"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="4" VerticalAlignment="Center">
-                                            <TextBlock Text="Memoria media" Foreground="{StaticResource Faint}" FontSize="11"/>
+                                            <TextBlock Text="Average memory" Foreground="{StaticResource Faint}" FontSize="11"/>
                                             <TextBlock Text="{Binding MemoryText}" FontSize="12.5"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="5" VerticalAlignment="Center">
-                                            <TextBlock Text="Ultima volta" Foreground="{StaticResource Faint}" FontSize="11"/>
+                                            <TextBlock Text="Last time" Foreground="{StaticResource Faint}" FontSize="11"/>
                                             <TextBlock Text="{Binding LastText}" FontSize="12.5"/>
                                         </StackPanel>
                                     </Grid>
@@ -732,7 +732,7 @@
                     </ListBox>
                     <Border x:Name="UsageEmpty" Grid.Row="2" CornerRadius="18" Background="{StaticResource Card}" Padding="30" VerticalAlignment="Top" Visibility="Collapsed">
                         <TextBlock Style="{StaticResource SubtleText}" TextAlignment="Center"
-                                   Text="Non ci sono ancora dati: attiva il monitoraggio e usa il PC normalmente. Dopo qualche ora qui vedrai quali programmi usi di più e quanto consumano."/>
+                                   Text="No data yet: turn on monitoring and use your PC normally. After a few hours you'll see here which programs you use most and how much they consume."/>
                     </Border>
                 </Grid>
             </Grid>
@@ -746,8 +746,8 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <StackPanel Margin="0,0,0,18">
-                    <TextBlock Text="Ottimizza il PC" Style="{StaticResource H1}"/>
-                    <TextBlock Text="Impostazioni che rendono Windows e i giochi più reattivi. Tutto quello che è segnato come annullabile si rimette com'era con «Ripristina»."
+                    <TextBlock Text="Optimize your PC" Style="{StaticResource H1}"/>
+                    <TextBlock Text="Settings that make Windows and games more responsive. Anything marked as reversible goes back to how it was with «Restore»."
                                Style="{StaticResource SubtleText}" Margin="0,4,0,0"/>
                 </StackPanel>
                 <Border Grid.Row="1" CornerRadius="20" Padding="26,22" Margin="0,0,0,18">
@@ -763,16 +763,16 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="Stato del PC" Foreground="{StaticResource Subtle}"/>
-                            <TextBlock x:Name="OptimizeScore" Text="Analisi…" FontFamily="{StaticResource DisplayFont}" FontSize="30" FontWeight="Bold" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                            <TextBlock Text="PC status" Foreground="{StaticResource Subtle}"/>
+                            <TextBlock x:Name="OptimizeScore" Text="Scanning…" FontFamily="{StaticResource DisplayFont}" FontSize="30" FontWeight="Bold" Margin="0,2,0,0" TextWrapping="Wrap"/>
                             <TextBlock x:Name="OptimizeStatus" Text="" Foreground="{StaticResource Subtle}" FontSize="12.5" TextWrapping="Wrap"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Button x:Name="RestoreButton" Style="{StaticResource GhostButton}" Content="Ripristina tutto" Margin="0,0,10,0" Click="OnOptimizeRestore"/>
-                            <Button x:Name="OptimizeButton" AutomationProperties.Name="Ottimizza ora" Style="{StaticResource PrimaryButton}" Padding="26,13" FontSize="15" Click="OnOptimizeClick">
+                            <Button x:Name="RestoreButton" Style="{StaticResource GhostButton}" Content="Restore all" Margin="0,0,10,0" Click="OnOptimizeRestore"/>
+                            <Button x:Name="OptimizeButton" AutomationProperties.Name="Optimize now" Style="{StaticResource PrimaryButton}" Padding="26,13" FontSize="15" Click="OnOptimizeClick">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE945;" FontFamily="{StaticResource Icons}" FontSize="15" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                    <TextBlock Text="Ottimizza ora"/>
+                                    <TextBlock Text="Optimize now"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -796,11 +796,11 @@
                         <StackPanel>
                             <DockPanel>
                                 <TextBlock Text="&#xE9D9;" Style="{StaticResource Glyph}" Foreground="#A99BFF" Margin="0,0,8,0"/>
-                                <TextBlock Text="Processore (CPU)" Foreground="{StaticResource Subtle}" VerticalAlignment="Center"/>
+                                <TextBlock Text="Processor (CPU)" Foreground="{StaticResource Subtle}" VerticalAlignment="Center"/>
                             </DockPanel>
                             <TextBlock x:Name="CpuValue" Text="…" FontFamily="{StaticResource DisplayFont}" FontSize="26" FontWeight="Bold" Margin="0,6,0,4"/>
                             <ProgressBar x:Name="CpuBar" Height="5" Maximum="100" Background="#22FFFFFF" BorderThickness="0" Foreground="{StaticResource AccentHorizontal}"/>
-                            <TextBlock Text="Usano di più adesso" FontSize="11.5" Foreground="{StaticResource Faint}" Margin="0,10,0,2"/>
+                            <TextBlock Text="Using the most right now" FontSize="11.5" Foreground="{StaticResource Faint}" Margin="0,10,0,2"/>
                             <ItemsControl x:Name="CpuTop" ItemTemplate="{StaticResource UsageRowTemplate}"/>
                         </StackPanel>
                     </Border>
@@ -808,7 +808,7 @@
                         <StackPanel>
                             <DockPanel>
                                 <TextBlock Text="&#xE950;" Style="{StaticResource Glyph}" Foreground="#A99BFF" Margin="0,0,8,0"/>
-                                <TextBlock Text="Memoria (RAM)" Foreground="{StaticResource Subtle}" VerticalAlignment="Center"/>
+                                <TextBlock Text="Memory (RAM)" Foreground="{StaticResource Subtle}" VerticalAlignment="Center"/>
                             </DockPanel>
                             <TextBlock x:Name="RamValue" Text="…" FontFamily="{StaticResource DisplayFont}" FontSize="26" FontWeight="Bold" Margin="0,6,0,4"/>
                             <ProgressBar x:Name="RamBar" Height="5" Maximum="100" Background="#22FFFFFF" BorderThickness="0" Foreground="{StaticResource AccentHorizontal}"/>
@@ -820,17 +820,17 @@
                         <StackPanel>
                             <DockPanel>
                                 <Button x:Name="RefreshResourcesButton" DockPanel.Dock="Right" Style="{StaticResource GhostButton}" Padding="10,4" FontSize="12"
-                                        Content="Aggiorna" Click="OnRefreshResources" AutomationProperties.Name="Aggiorna risorse"/>
+                                        Content="Refresh" Click="OnRefreshResources" AutomationProperties.Name="Refresh resources"/>
                                 <TextBlock Text="&#xE7F4;" Style="{StaticResource Glyph}" Foreground="#A99BFF" Margin="0,0,8,0"/>
-                                <TextBlock Text="Scheda video" Foreground="{StaticResource Subtle}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="Graphics card" Foreground="{StaticResource Subtle}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                             </DockPanel>
                             <TextBlock x:Name="GpuNames" Text="…" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,8,0,2"/>
                             <TextBlock x:Name="GpuScheduling" Text="" FontSize="12" Foreground="{StaticResource Subtle}" TextWrapping="Wrap"/>
                             <WrapPanel Margin="0,10,0,0">
                                 <Button x:Name="GpuSettingsButton" Style="{StaticResource GhostButton}" Padding="12,6" FontSize="12" Margin="0,0,8,6"
-                                        Content="Impostazioni grafica" Click="OnOpenGraphicsSettings" AutomationProperties.Name="Impostazioni grafica"/>
+                                        Content="Graphics settings" Click="OnOpenGraphicsSettings" AutomationProperties.Name="Graphics settings"/>
                                 <Button x:Name="GpuGameButton" Style="{StaticResource PrimaryButton}" Padding="12,6" FontSize="12" Margin="0,0,0,6" Visibility="Collapsed"
-                                        Content="Gioco sulla scheda dedicata…" Click="OnGameOnDedicatedGpu" AutomationProperties.Name="Gioco sulla scheda dedicata"/>
+                                        Content="Game on dedicated card…" Click="OnGameOnDedicatedGpu" AutomationProperties.Name="Game on dedicated card"/>
                             </WrapPanel>
                             <TextBlock x:Name="GpuGames" Text="" FontSize="11.5" Foreground="{StaticResource Faint}" TextWrapping="Wrap"/>
                         </StackPanel>
@@ -897,21 +897,21 @@
                 </Grid.RowDefinitions>
                 <Grid Margin="0,0,0,18">
                     <StackPanel Margin="0,0,320,0">
-                        <TextBlock Text="Errori e crash" Style="{StaticResource H1}"/>
-                        <TextBlock Text="Programmi che si sono chiusi da soli, blocchi e schermate blu degli ultimi 30 giorni, spiegati in parole semplici."
+                        <TextBlock Text="Errors &amp; crashes" Style="{StaticResource H1}"/>
+                        <TextBlock Text="Programs that closed on their own, freezes and blue screens from the last 30 days, explained in plain words."
                                    Style="{StaticResource SubtleText}" Margin="0,4,0,0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                         <Button Style="{StaticResource BaseButton}" Click="OnCrashRefresh" Margin="0,0,10,0">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE72C;" FontFamily="{StaticResource Icons}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <TextBlock Text="Aggiorna"/>
+                                <TextBlock Text="Refresh"/>
                             </StackPanel>
                         </Button>
                         <Button Style="{StaticResource PrimaryButton}" Click="OnCrashSave">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE74E;" FontFamily="{StaticResource Icons}" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <TextBlock Text="Salva rapporto"/>
+                                <TextBlock Text="Save report"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -926,19 +926,19 @@
                     </Grid.ColumnDefinitions>
                     <Border CornerRadius="16" Padding="18,14" Background="{StaticResource Card}">
                         <StackPanel>
-                            <TextBlock Text="App chiuse da sole" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
+                            <TextBlock Text="Apps that crashed" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
                             <TextBlock x:Name="CrashStatApps" Text="—" FontFamily="{StaticResource DisplayFont}" FontSize="26" FontWeight="Bold" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Border>
                     <Border Grid.Column="2" CornerRadius="16" Padding="18,14" Background="{StaticResource Card}">
                         <StackPanel>
-                            <TextBlock Text="Blocchi" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
+                            <TextBlock Text="Freezes" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
                             <TextBlock x:Name="CrashStatHangs" Text="—" FontFamily="{StaticResource DisplayFont}" FontSize="26" FontWeight="Bold" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Border>
                     <Border Grid.Column="4" CornerRadius="16" Padding="18,14" Background="{StaticResource Card}">
                         <StackPanel>
-                            <TextBlock Text="Schermate blu e spegnimenti" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
+                            <TextBlock Text="Blue screens &amp; shutdowns" Foreground="{StaticResource Subtle}" FontSize="12.5"/>
                             <TextBlock x:Name="CrashStatSystem" Text="—" FontFamily="{StaticResource DisplayFont}" FontSize="26" FontWeight="Bold" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Border>
@@ -964,7 +964,7 @@
                                             <TextBlock Text="{Binding Explanation}" Style="{StaticResource SubtleText}" Margin="0,5,0,0"/>
                                             <Border CornerRadius="10" Background="#1B2030" Padding="12,8" Margin="0,8,0,0">
                                                 <TextBlock TextWrapping="Wrap" FontSize="13">
-                                                    <Run Text="Cosa fare: " FontWeight="SemiBold" Foreground="#A99BFF"/><Run Text="{Binding Advice, Mode=OneWay}"/>
+                                                    <Run Text="What to do: " FontWeight="SemiBold" Foreground="#A99BFF"/><Run Text="{Binding Advice, Mode=OneWay}"/>
                                                 </TextBlock>
                                             </Border>
                                             <TextBlock Text="{Binding Details}" Foreground="{StaticResource Faint}" FontSize="11.5" Margin="0,6,0,0" TextTrimming="CharacterEllipsis"
@@ -987,15 +987,15 @@
                             <Ellipse Stroke="#22FFFFFF" StrokeThickness="5"/>
                             <Path Stroke="{StaticResource Accent}" StrokeThickness="5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M 26,2.5 A 23.5,23.5 0 0 1 49.5,26"/>
                         </Grid>
-                        <TextBlock Text="Leggo il Registro eventi di Windows…" Foreground="{StaticResource Subtle}" Margin="0,16,0,0"/>
+                        <TextBlock Text="Reading the Windows Event Log…" Foreground="{StaticResource Subtle}" Margin="0,16,0,0"/>
                     </StackPanel>
                     <Border x:Name="CrashEmpty" CornerRadius="20" Background="{StaticResource Card}" Padding="40" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
                         <StackPanel>
                             <Border Width="72" Height="72" CornerRadius="36" Background="{StaticResource SuccessSoft}" HorizontalAlignment="Center">
                                 <TextBlock Text="&#xE73E;" Style="{StaticResource Glyph}" FontSize="30" Foreground="{StaticResource Success}"/>
                             </Border>
-                            <TextBlock Text="Nessun crash negli ultimi 30 giorni" Style="{StaticResource H2}" HorizontalAlignment="Center" Margin="0,20,0,6"/>
-                            <TextBlock Text="Il tuo PC non ha registrato chiusure improvvise o schermate blu." Style="{StaticResource SubtleText}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="No crashes in the last 30 days" Style="{StaticResource H2}" HorizontalAlignment="Center" Margin="0,20,0,6"/>
+                            <TextBlock Text="Your PC recorded no sudden closes or blue screens." Style="{StaticResource SubtleText}" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -1032,19 +1032,19 @@
                             </StackPanel>
                         </Grid>
 
-                        <TextBlock Text="Cosa succede adesso" FontWeight="SemiBold" Margin="0,24,0,10"/>
+                        <TextBlock Text="What happens now" FontWeight="SemiBold" Margin="0,24,0,10"/>
                         <StackPanel x:Name="DlgSteps">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                                 <Border Width="24" Height="24" CornerRadius="12" Background="{StaticResource AccentSoft}"><TextBlock Text="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" FontWeight="Bold" Foreground="#A99BFF"/></Border>
-                                <TextBlock x:Name="DlgStep1" Text="Avvio il programma di disinstallazione ufficiale dell'app." Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource Subtle}"/>
+                                <TextBlock x:Name="DlgStep1" Text="I'll start the app's official uninstaller." Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource Subtle}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                                 <Border Width="24" Height="24" CornerRadius="12" Background="{StaticResource AccentSoft}"><TextBlock Text="2" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" FontWeight="Bold" Foreground="#A99BFF"/></Border>
-                                <TextBlock Text="Cerco cartelle, collegamenti e chiavi di registro rimasti." Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource Subtle}"/>
+                                <TextBlock Text="I'll look for leftover folders, shortcuts and registry keys." Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource Subtle}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Border Width="24" Height="24" CornerRadius="12" Background="{StaticResource AccentSoft}"><TextBlock Text="3" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" FontWeight="Bold" Foreground="#A99BFF"/></Border>
-                                <TextBlock Text="Ti mostro i residui: scegli tu cosa eliminare." Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource Subtle}"/>
+                                <TextBlock Text="I'll show you the leftovers: you choose what to delete." Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource Subtle}"/>
                             </StackPanel>
                         </StackPanel>
 
@@ -1052,14 +1052,14 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE7BA;" Style="{StaticResource Glyph}" Foreground="{StaticResource Warning}" Margin="0,0,10,0" VerticalAlignment="Top"/>
                                 <TextBlock TextWrapping="Wrap" Foreground="#F5D98B" FontSize="12.5" MaxWidth="500"
-                                           Text="Il programma di disinstallazione di questa app non esiste più (l'app è stata cancellata a metà). Lindo può fare una rimozione forzata: elimina direttamente i file rimasti e la voce dall'elenco."/>
+                                           Text="This app's uninstaller no longer exists (the app was half-deleted). Lindo can do a force removal: it deletes the leftover files and the list entry directly."/>
                             </StackPanel>
                         </Border>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,28,0,0">
-                            <Button Style="{StaticResource GhostButton}" Content="Annulla" Click="OnDialogCancel" Margin="0,0,10,0"/>
-                            <Button x:Name="DlgConfirmButton" AutomationProperties.Name="Conferma" Style="{StaticResource DangerButton}" Click="OnConfirmUninstall" Padding="22,10">
-                                <TextBlock x:Name="DlgConfirmText" Text="Disinstalla"/>
+                            <Button Style="{StaticResource GhostButton}" Content="Cancel" Click="OnDialogCancel" Margin="0,0,10,0"/>
+                            <Button x:Name="DlgConfirmButton" AutomationProperties.Name="Confirm" Style="{StaticResource DangerButton}" Click="OnConfirmUninstall" Padding="22,10">
+                                <TextBlock x:Name="DlgConfirmText" Text="Uninstall"/>
                             </Button>
                         </StackPanel>
                     </StackPanel>
@@ -1072,9 +1072,9 @@
                             <Path Stroke="{StaticResource Accent}" StrokeThickness="6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                   Data="M 32,3 A 29,29 0 0 1 61,32"/>
                         </Grid>
-                        <TextBlock x:Name="DlgRunningTitle" Text="Disinstallazione in corso" Style="{StaticResource H2}" HorizontalAlignment="Center" Margin="0,22,0,6"/>
+                        <TextBlock x:Name="DlgRunningTitle" Text="Uninstalling" Style="{StaticResource H2}" HorizontalAlignment="Center" Margin="0,22,0,6"/>
                         <TextBlock x:Name="DlgRunningText" Text="" Style="{StaticResource SubtleText}" TextAlignment="Center" HorizontalAlignment="Center" MaxWidth="460"/>
-                        <Button x:Name="DlgSkipWait" Style="{StaticResource BaseButton}" Content="Ho finito, cerca i residui" HorizontalAlignment="Center" Margin="0,24,0,0" Click="OnSkipWait"/>
+                        <Button x:Name="DlgSkipWait" Style="{StaticResource BaseButton}" Content="I'm done, find leftovers" HorizontalAlignment="Center" Margin="0,24,0,0" Click="OnSkipWait"/>
                     </StackPanel>
 
                     <!-- Residui trovati -->
@@ -1085,25 +1085,25 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <StackPanel>
-                            <TextBlock x:Name="DlgLeftoversTitle" Text="Residui trovati" Style="{StaticResource H2}"/>
+                            <TextBlock x:Name="DlgLeftoversTitle" Text="Leftovers found" Style="{StaticResource H2}"/>
                             <TextBlock x:Name="DlgLeftoversText" Style="{StaticResource SubtleText}" Margin="0,4,0,14"/>
                             <Border x:Name="DlgDriverQuestion" CornerRadius="12" Padding="14,10" Background="#2222D3EE" Margin="0,0,0,12" Visibility="Collapsed">
                                 <DockPanel>
                                     <TextBlock DockPanel.Dock="Left" Text="&#xE772;" Style="{StaticResource Glyph}" Foreground="#67E8F9" Margin="0,0,12,0"/>
                                     <StackPanel>
                                         <TextBlock x:Name="DlgDriverText" TextWrapping="Wrap" FontSize="13"/>
-                                        <CheckBox x:Name="DlgDriverCheck" Content="Sì, elimina anche i driver" Margin="0,8,0,0" Checked="OnDlgDriverCheck" Unchecked="OnDlgDriverCheck"/>
+                                        <CheckBox x:Name="DlgDriverCheck" Content="Yes, delete the drivers too" Margin="0,8,0,0" Checked="OnDlgDriverCheck" Unchecked="OnDlgDriverCheck"/>
                                     </StackPanel>
                                 </DockPanel>
                             </Border>
                         </StackPanel>
                         <ListBox x:Name="DlgLeftoversList" Grid.Row="1" Style="{StaticResource PlainList}" ItemTemplate="{StaticResource LeftoverRow}" MaxHeight="380" Margin="0,0,-8,0" Padding="0,0,8,0"/>
                         <Grid Grid.Row="2" Margin="0,18,0,0">
-                            <CheckBox x:Name="DlgSelectAll" Content="Seleziona tutto" Foreground="{StaticResource Subtle}" Checked="OnDlgSelectAll" Unchecked="OnDlgSelectAll" VerticalAlignment="Center"/>
+                            <CheckBox x:Name="DlgSelectAll" Content="Select all" Foreground="{StaticResource Subtle}" Checked="OnDlgSelectAll" Unchecked="OnDlgSelectAll" VerticalAlignment="Center"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button x:Name="DlgSkipLeftovers" Style="{StaticResource GhostButton}" Content="Salta" Click="OnSkipLeftovers" Margin="0,0,10,0"/>
-                                <Button x:Name="DlgDeleteButton" AutomationProperties.Name="Elimina selezionati" Style="{StaticResource DangerButton}" Click="OnDeleteLeftovers" Padding="22,10">
-                                    <TextBlock x:Name="DlgDeleteText" Text="Elimina selezionati"/>
+                                <Button x:Name="DlgSkipLeftovers" Style="{StaticResource GhostButton}" Content="Skip" Click="OnSkipLeftovers" Margin="0,0,10,0"/>
+                                <Button x:Name="DlgDeleteButton" AutomationProperties.Name="Delete selected" Style="{StaticResource DangerButton}" Click="OnDeleteLeftovers" Padding="22,10">
+                                    <TextBlock x:Name="DlgDeleteText" Text="Delete selected"/>
                                 </Button>
                             </StackPanel>
                         </Grid>
@@ -1134,7 +1134,7 @@
                         </Border>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,24,0,0">
                             <Button x:Name="DlgResultSecondary" Style="{StaticResource GhostButton}" Margin="0,0,10,0" Click="OnResultSecondary" Visibility="Collapsed"/>
-                            <Button x:Name="DlgResultPrimary" Style="{StaticResource PrimaryButton}" Content="Fatto" Padding="34,10" Click="OnResultPrimary"/>
+                            <Button x:Name="DlgResultPrimary" Style="{StaticResource PrimaryButton}" Content="Done" Padding="34,10" Click="OnResultPrimary"/>
                         </StackPanel>
                     </StackPanel>
                 </Grid>

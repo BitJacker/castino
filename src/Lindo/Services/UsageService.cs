@@ -226,7 +226,7 @@ namespace Lindo.Services
                 {
                     if (on)
                     {
-                        if (!File.Exists(MonitorExe)) return "LindoMonitor.exe non trovato accanto a Lindo.exe";
+                        if (!File.Exists(MonitorExe)) return "LindoMonitor.exe not found next to Lindo.exe";
                         k.SetValue(RunValueName, "\"" + MonitorExe + "\"");
                         if (!IsMonitorRunning()) Process.Start(new ProcessStartInfo(MonitorExe) { UseShellExecute = true });
                     }

@@ -48,14 +48,14 @@ namespace Lindo
                 {
                     var item = new StartupItem(e);
                     if (!string.IsNullOrEmpty(e.ExePath) && store.Records.TryGetValue(e.ExePath, out var rec))
-                        item.UsageText = "Media " + rec.AverageMemoryMb + " MB · CPU " + TimeText.Duration(rec.CpuMs / 1000);
+                        item.UsageText = "Average " + rec.AverageMemoryMb + " MB · CPU " + TimeText.Duration(rec.CpuMs / 1000);
                     _startup.Add(item);
                 }
                 var enabled = _startupEntries.Count(x => x.Enabled);
                 var suggested = _startupEntries.Count(x => x.Enabled && x.Suggested);
-                StartupSummary.Text = $"{enabled} elementi partono con Windows" +
-                                      (suggested > 0 ? $", {suggested} si possono togliere senza problemi." : ".") +
-                                      " Qui trovi anche servizi e attività che il pannello di Windows non mostra.";
+                StartupSummary.Text = $"{enabled} items start with Windows" +
+                                      (suggested > 0 ? $", {suggested} can safely be turned off." : ".") +
+                                      " Here you also find services and tasks that the Windows panel doesn't show.";
                 _ = Task.Run(() =>
                 {
                     foreach (var it in _startup.ToList())
@@ -84,12 +84,12 @@ namespace Lindo
             if (err == null)
             {
                 item.Enabled = target;
-                ShowToast(item.Name + (target ? " partirà con Windows" : item.IsService ? " ora parte solo quando serve" : " non partirà più con Windows"));
+                ShowToast(item.Name + (target ? " will start with Windows" : item.IsService ? " now starts only when needed" : " won't start with Windows anymore"));
             }
             else
             {
                 (sender as ToggleButton).IsChecked = item.Enabled;
-                ShowToast("Impossibile modificare: " + err, ok: false);
+                ShowToast("Couldn't change it: " + err, ok: false);
             }
         }
 
@@ -110,8 +110,8 @@ namespace Lindo
         private void LoadUsage()
         {
             MonitorSwitch.IsChecked = UsageService.IsMonitorEnabled();
-            MonitorStatus.Text = (UsageService.IsMonitorRunning() ? "Attivo adesso. " : MonitorSwitch.IsChecked == true ? "Si avvierà al prossimo accesso. " : "Disattivato. ") +
-                                 "Ogni 30 secondi LindoMonitor guarda quali programmi sono aperti e quanto consumano. I dati restano solo sul tuo PC.";
+            MonitorStatus.Text = (UsageService.IsMonitorRunning() ? "Running now. " : MonitorSwitch.IsChecked == true ? "It will start at the next sign-in. " : "Off. ") +
+                                 "Every 30 seconds LindoMonitor checks which programs are open and how much they use. The data stays on your PC only.";
             var store = UsageService.LoadStore();
             var records = store.Records.Values.Where(r => r.Samples > 0).ToList();
             IEnumerable<UsageRecord> sorted =
@@ -161,7 +161,7 @@ namespace Lindo
                 ShowToast(err, ok: false);
                 return;
             }
-            ShowToast(on ? "Monitoraggio attivato: parte anche a ogni accesso" : "Monitoraggio disattivato");
+            ShowToast(on ? "Monitoring on: it also starts at every sign-in" : "Monitoring off");
             LoadUsage();
         }
 
@@ -175,7 +175,7 @@ namespace Lindo
 
         private async Task LoadOptimizeAsync()
         {
-            OptimizeScore.Text = "Analisi…";
+            OptimizeScore.Text = "Scanning…";
             _optimize.Clear();
             var actions = OptimizeService.Actions(() => _startupEntries.Count > 0 ? _startupEntries : (_startupEntries = StartupService.Scan()));
             foreach (var a in actions) _optimize.Add(new OptimizeItem(a));
@@ -205,7 +205,7 @@ namespace Lindo
                 CpuValue.Text = Math.Round(snap.CpuPercent) + "%";
                 CpuBar.Value = snap.CpuPercent;
                 CpuTop.ItemsSource = snap.TopCpu.Count == 0
-                    ? new List<UsageLine> { new UsageLine { Name = "Il processore è a riposo", Value = "" } }
+                    ? new List<UsageLine> { new UsageLine { Name = "The processor is idle", Value = "" } }
                     : snap.TopCpu.Select(u => new UsageLine { Name = Pretty(u), Value = u.CpuPercent.ToString("0.0") + "%" }).ToList();
 
                 if (snap.RamTotal > 0)
@@ -213,7 +213,7 @@ namespace Lindo
                     var used = snap.RamTotal - snap.RamAvailable;
                     RamValue.Text = snap.MemoryLoad + "%";
                     RamBar.Value = snap.MemoryLoad;
-                    RamDetail.Text = $"{SizeFormat.Format(used)} usati su {SizeFormat.Format(snap.RamTotal)} · liberi {SizeFormat.Format(snap.RamAvailable)}";
+                    RamDetail.Text = $"{SizeFormat.Format(used)} used of {SizeFormat.Format(snap.RamTotal)} · {SizeFormat.Format(snap.RamAvailable)} free";
                 }
                 RamTop.ItemsSource = snap.TopRam.Select(u => new UsageLine { Name = Pretty(u), Value = SizeFormat.Format(u.MemoryBytes) }).ToList();
 
@@ -227,19 +227,19 @@ namespace Lindo
         {
             if (_gpu == null) return;
             GpuNames.Text = _gpu.Names.Count > 0 ? string.Join("\n", _gpu.Names)
-                : _gpu.AllNames.Count > 0 ? _gpu.AllNames[0] + " (scheda virtuale)"
-                : "Scheda video non riconosciuta";
+                : _gpu.AllNames.Count > 0 ? _gpu.AllNames[0] + " (virtual adapter)"
+                : "Graphics card not recognized";
             GpuScheduling.Text = _gpu.HardwareScheduling == true
-                ? "Pianificazione GPU con accelerazione hardware: attiva"
+                ? "Hardware-accelerated GPU scheduling: on"
                 : _gpu.HardwareScheduling == false
-                    ? "Pianificazione GPU con accelerazione hardware: non attiva. Puoi provarla da «Impostazioni grafica» (richiede un riavvio; in alcuni giochi aiuta, in altri no)."
-                    : "Pianificazione GPU con accelerazione hardware: non disponibile o mai impostata su questo PC.";
+                    ? "Hardware-accelerated GPU scheduling: off. You can try it from «Graphics settings» (needs a restart; it helps in some games, not in others)."
+                    : "Hardware-accelerated GPU scheduling: not available or never set on this PC.";
             GpuGameButton.Visibility = _gpu.HasTwoGpus ? Visibility.Visible : Visibility.Collapsed;
             var games = ResourceService.LindoGpuPreferences();
             GpuGames.Text = !_gpu.HasTwoGpus
-                ? "Hai una sola scheda video: i giochi la usano già."
-                : games.Count == 0 ? "Hai due schede video: scegli un gioco da far girare su quella più potente."
-                : "Sulla scheda dedicata: " + string.Join(", ", games.Select(System.IO.Path.GetFileNameWithoutExtension));
+                ? "You have one graphics card: games already use it."
+                : games.Count == 0 ? "You have two graphics cards: pick a game to run on the more powerful one."
+                : "On the dedicated card: " + string.Join(", ", games.Select(System.IO.Path.GetFileNameWithoutExtension));
         }
 
         private async void OnRefreshResources(object sender, RoutedEventArgs e) => await RefreshResourcesAsync();
@@ -250,14 +250,14 @@ namespace Lindo
         {
             var dlg = new Microsoft.Win32.OpenFileDialog
             {
-                Title = "Scegli il gioco (file .exe) da far girare sulla scheda video dedicata",
-                Filter = "Programmi (*.exe)|*.exe",
+                Title = "Pick the game (.exe file) to run on the dedicated graphics card",
+                Filter = "Programs (*.exe)|*.exe",
                 CheckFileExists = true,
             };
             if (dlg.ShowDialog(this) != true) return;
             var err = ResourceService.SetHighPerformanceGpu(dlg.FileName);
-            if (err != null) { ShowToast("Non riuscito: " + err, ok: false); return; }
-            ShowToast(System.IO.Path.GetFileNameWithoutExtension(dlg.FileName) + " userà la scheda video dedicata (dal prossimo avvio del gioco)");
+            if (err != null) { ShowToast("Failed: " + err, ok: false); return; }
+            ShowToast(System.IO.Path.GetFileNameWithoutExtension(dlg.FileName) + " will use the dedicated graphics card (from the next time the game starts)");
             RestoreButton.IsEnabled = true;
             ShowGpu();
         }
@@ -275,10 +275,10 @@ namespace Lindo
             }
             var reversible = _optimize.Where(o => o.Reversible).ToList();
             var done = reversible.Count(o => o.IsApplied);
-            OptimizeScore.Text = done == reversible.Count ? "Ottimizzato ✓" : $"{done} di {reversible.Count} ottimizzazioni attive";
+            OptimizeScore.Text = done == reversible.Count ? "Optimized ✓" : $"{done} of {reversible.Count} optimizations on";
             OptimizeStatus.Text = done == reversible.Count
-                ? "Il PC è già configurato al meglio. Puoi comunque ripulire i file temporanei."
-                : "Seleziona cosa vuoi migliorare e premi «Ottimizza ora». Alcune modifiche valgono dal prossimo accesso.";
+                ? "Your PC is already set up for the best performance. You can still clean temporary files."
+                : "Select what you want to improve and press «Optimize now». Some changes apply from the next sign-in.";
             RestoreButton.IsEnabled = _optimize.Any(o => o.Reversible && OptimizeService.HasBackup(o.Action.Id)) ||
                                       ResourceService.LindoGpuPreferences().Count > 0;
         }
@@ -286,13 +286,13 @@ namespace Lindo
         private async void OnOptimizeClick(object sender, RoutedEventArgs e)
         {
             var selected = _optimize.Where(o => o.IsSelected).ToList();
-            if (selected.Count == 0) { ShowToast("Seleziona almeno un'ottimizzazione", ok: false); return; }
+            if (selected.Count == 0) { ShowToast("Select at least one optimization", ok: false); return; }
             OptimizeButton.IsEnabled = false;
             var (freeBefore, _) = SystemInfo.DiskSpace();
             var errors = new List<string>();
             foreach (var o in selected)
             {
-                OptimizeStatus.Text = "Applico: " + o.Title + "…";
+                OptimizeStatus.Text = "Applying: " + o.Title + "…";
                 var err = await Task.Run(() => { try { return o.Action.Apply(); } catch (Exception ex) { return ex.Message; } });
                 if (err != null) errors.Add(o.Title + ": " + err);
                 Log.Write("Ottimizza " + o.Action.Id + " → " + (err ?? "ok"));
@@ -306,9 +306,9 @@ namespace Lindo
 
             var checks = selected.Where(o => !errors.Any(x => x.StartsWith(o.Title))).Select(o => CheckLine.Ok(o.Title)).ToList();
             checks.AddRange(errors.Select(CheckLine.Fail));
-            if (freeAfter > freeBefore) checks.Add(CheckLine.Info("Spazio liberato: " + SizeFormat.Format(freeAfter - freeBefore)));
-            checks.Add(CheckLine.Info("Riavvia il PC (o esci e rientra) per applicare tutto. Puoi annullare con «Ripristina tutto»."));
-            ShowResult(errors.Count == 0 ? "PC ottimizzato" : "Ottimizzazione completata con qualche avviso", null, checks, success: errors.Count == 0);
+            if (freeAfter > freeBefore) checks.Add(CheckLine.Info("Space freed: " + SizeFormat.Format(freeAfter - freeBefore)));
+            checks.Add(CheckLine.Info("Restart the PC (or sign out and back in) to apply everything. You can undo it with «Restore all»."));
+            ShowResult(errors.Count == 0 ? "PC optimized" : "Optimization done with some warnings", null, checks, success: errors.Count == 0);
         }
 
         private async void OnOptimizeRestore(object sender, RoutedEventArgs e)
@@ -325,7 +325,7 @@ namespace Lindo
             _startupLoaded = false;
             foreach (var o in _optimize) o.IsSelected = o.Action.DefaultSelected;
             await RefreshOptimizeStateAsync();
-            ShowToast("Impostazioni originali ripristinate");
+            ShowToast("Original settings restored");
         }
 
         // ================================================================== Errori e crash
@@ -342,7 +342,7 @@ namespace Lindo
                 _crashGroups = await Task.Run(() => CrashService.Scan(30));
                 foreach (var g in _crashGroups) _crashes.Add(new CrashItem(g));
                 CrashStatApps.Text = _crashGroups.Where(g => g.Kind == "App").Sum(g => g.Count).ToString();
-                CrashStatHangs.Text = _crashGroups.Where(g => g.Kind == "Blocco").Sum(g => g.Count).ToString();
+                CrashStatHangs.Text = _crashGroups.Where(g => g.Kind == "Hang").Sum(g => g.Count).ToString();
                 CrashStatSystem.Text = _crashGroups.Where(g => g.IsSystem).Sum(g => g.Count).ToString();
             }
             catch (Exception ex) { Log.Write("Crash: " + ex); }
@@ -361,10 +361,10 @@ namespace Lindo
             try
             {
                 var path = CrashService.SaveReport(_crashGroups);
-                ShowToast("Rapporto salvato");
+                ShowToast("Report saved");
                 OpenPath(path, select: true);
             }
-            catch (Exception ex) { ShowToast("Impossibile salvare: " + ex.Message, ok: false); }
+            catch (Exception ex) { ShowToast("Couldn't save: " + ex.Message, ok: false); }
         }
     }
 }

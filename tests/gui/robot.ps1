@@ -250,7 +250,7 @@ function Uninstall-Flow($label) {
 }
 
 function Wait-Apps-Loaded {
-    Wait-For { $t = Text-Of $script:win 'AppsSummary'; $t -and $t -notlike 'Analisi*' } 180 'elenco app' | Out-Null
+    Wait-For { $t = Text-Of $script:win 'AppsSummary'; $t -and $t -notlike 'Scanning*' } 180 'elenco app' | Out-Null
     Start-Sleep -Seconds 4
 }
 
@@ -281,7 +281,7 @@ Step '1. Disinstallo VLC dal suo pulsante' {
 Set-Text (Find-ById $script:win 'SearchBox') 'VLC'
 Start-Sleep -Seconds 2
 Shot 'ricerca-vlc'
-$btn = Wait-For { Find-ByName $script:win 'Disinstalla VLC media player' } 20 'pulsante Disinstalla VLC'
+$btn = Wait-For { Find-ByName $script:win 'Uninstall VLC media player' } 20 'pulsante Disinstalla VLC'
 Check ($btn -ne $null) "Trovo il pulsante Disinstalla di VLC"
 if ($btn) {
     Click $btn
@@ -307,7 +307,7 @@ foreach ($n in '7-Zip*', 'Notepad++*') {
     Start-Sleep -Seconds 2
     $cb = $script:win.FindFirst($TS::Descendants, (New-Object $PC ($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::CheckBox)))
     $all = $script:win.FindAll($TS::Descendants, (New-Object $PC ($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::CheckBox)))
-    foreach ($c in $all) { if ($c.Current.Name -like "Seleziona $n") { Toggle-On $c; $sel++; Log "Selezionata: $($c.Current.Name)"; break } }
+    foreach ($c in $all) { if ($c.Current.Name -like "Select $n") { Toggle-On $c; $sel++; Log "Selezionata: $($c.Current.Name)"; break } }
 }
 Set-Text (Find-ById $script:win 'SearchBox') ''
 Start-Sleep -Seconds 2
@@ -340,7 +340,7 @@ Step '3. Residui e verifica' {
 Click (Find-ById $script:win 'NavLeftovers')
 Start-Sleep -Seconds 1
 Click (Find-ById $script:win 'ScanOrphansButton')
-Wait-For { ((Text-Of $script:win 'OrphansSelection') -like '*selezionati*') -or (Visible (Find-ById $script:win 'OrphansClean')) } 300 'analisi residui' | Out-Null
+Wait-For { ((Text-Of $script:win 'OrphansSelection') -like '*selected*') -or (Visible (Find-ById $script:win 'OrphansClean')) } 300 'analisi residui' | Out-Null
 Start-Sleep -Seconds 2
 Shot 'residui'
 $selAll = Find-ById $script:win 'OrphansSelectAll'
@@ -354,7 +354,7 @@ if (Visible $selAll) {
     Shot 'residui-conferma'
     Click (Find-ById $script:win 'DlgResultPrimary')   # "Elimina"
     Start-Sleep -Seconds 2
-    Wait-For { $t = Text-Of $script:win 'DlgResultTitle'; (Visible (Find-ById $script:win 'DlgResultTitle')) -and $t -notlike 'Eliminare*' } 300 'pulizia residui' | Out-Null
+    Wait-For { $t = Text-Of $script:win 'DlgResultTitle'; (Visible (Find-ById $script:win 'DlgResultTitle')) -and $t -notlike 'Delete *' } 300 'pulizia residui' | Out-Null
     Log ("Risultato: " + (Text-Of $script:win 'DlgResultTitle'))
     Shot 'residui-risultato'
     Click (Find-ById $script:win 'DlgResultPrimary')
@@ -369,7 +369,7 @@ Step '4. Ottimizza e Ripristina' {
 $dvrBefore = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR' -ErrorAction SilentlyContinue).AppCaptureEnabled
 $mouseBefore = (Get-ItemProperty 'HKCU:\Control Panel\Mouse').MouseSpeed
 Click (Find-ById $script:win 'NavOptimize')
-Wait-For { $t = Text-Of $script:win 'OptimizeScore'; $t -and $t -ne 'Analisi…' } 60 'analisi ottimizzazioni' | Out-Null
+Wait-For { $t = Text-Of $script:win 'OptimizeScore'; $t -and $t -ne 'Scanning…' } 60 'analisi ottimizzazioni' | Out-Null
 $res = Wait-For { $c = Text-Of $script:win 'CpuValue'; $r = Text-Of $script:win 'RamValue'; if ($c -like '*%' -and $r -like '*%') { "$c|$r" } } 90 'lettura CPU e RAM'
 Log ("Risorse lette da Lindo: CPU " + (Text-Of $script:win 'CpuValue') + ", RAM " + (Text-Of $script:win 'RamValue') + " · GPU: " + (Text-Of $script:win 'GpuNames'))
 Check ($res -ne $null) "Lindo mostra l'uso di CPU e RAM"
@@ -387,7 +387,7 @@ Check ((Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDV
 Check ((Get-ItemProperty 'HKCU:\Control Panel\Mouse').MouseSpeed -eq '0') "Accelerazione del mouse disattivata"
 Check ((powercfg /getactivescheme) -match '8c5e7fda') "Piano energetico Prestazioni elevate attivo"
 Start-Sleep -Seconds 2
-Click (Find-ByName $script:win 'Ripristina tutto')
+Click (Find-ByName $script:win 'Restore all')
 Start-Sleep -Seconds 8
 Shot 'ottimizza-ripristino'
 Check ((Get-ItemProperty 'HKCU:\Control Panel\Mouse').MouseSpeed -eq $mouseBefore) "Mouse ripristinato com'era ($mouseBefore)"
@@ -399,7 +399,7 @@ Check ($dvrAfter -eq $dvrBefore) "Game Bar ripristinata com'era"
 # ---------------------------------------------------------------- 5. Avvio
 Step '5. App all''avvio' {
 Click (Find-ById $script:win 'NavStartup')
-$sw = Wait-For { Find-ByName $script:win 'Avvio LindoProvaAvvio' } 120 'app di prova all''avvio'
+$sw = Wait-For { Find-ByName $script:win 'Startup LindoProvaAvvio' } 120 'app di prova all''avvio'
 Shot 'avvio'
 Check ($sw -ne $null) "L'app di prova compare tra le app all'avvio"
 if ($sw) {
@@ -409,7 +409,7 @@ if ($sw) {
     Check ($v -and ($v[0] -band 1) -eq 1) "Disattivata come fa Gestione attività (StartupApproved = 03)"
     Check ((Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run').LindoProvaAvvio -ne $null) "La voce originale non è stata cancellata"
     Shot 'avvio-disattivata'
-    Click (Find-ByName $script:win 'Avvio LindoProvaAvvio')
+    Click (Find-ByName $script:win 'Startup LindoProvaAvvio')
     Start-Sleep -Seconds 3
     $v = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run').LindoProvaAvvio
     Check ($v -and ($v[0] -band 1) -eq 0) "Riattivata"
@@ -427,7 +427,7 @@ Start-Sleep -Seconds 1
 Wait-For { -not (Visible (Find-ById $script:win 'CrashLoading')) } 120 'lettura crash' | Out-Null
 Start-Sleep -Seconds 2
 Shot 'crash'
-$crash = Find-ByName $script:win 'powershell.exe si è chiuso all''improvviso'
+$crash = Find-ByName $script:win 'powershell.exe closed unexpectedly'
 Check ($crash -ne $null) "Il crash provocato compare e viene spiegato"
 
 }

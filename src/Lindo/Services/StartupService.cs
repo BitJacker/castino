@@ -45,10 +45,10 @@ namespace Lindo.Services
             {
                 switch (Kind)
                 {
-                    case StartupKind.Service: return "Servizio";
-                    case StartupKind.Task: return "Attività pianificata";
-                    case StartupKind.StartupFolder: return "Cartella Esecuzione automatica";
-                    default: return AllUsers ? "Registro (tutti gli utenti)" : "Registro";
+                    case StartupKind.Service: return "Service";
+                    case StartupKind.Task: return "Scheduled task";
+                    case StartupKind.StartupFolder: return "Startup folder";
+                    default: return AllUsers ? "Registry (all users)" : "Registry";
                 }
             }
         }
@@ -298,7 +298,7 @@ namespace Lindo.Services
                         var cmd = (enabled ? "Enable" : "Disable") + "-ScheduledTask -TaskPath '" + e.TaskPath.Replace("'", "''") +
                                   "' -TaskName '" + e.TaskName.Replace("'", "''") + "' | Out-Null; 'ok'";
                         var o = PowerShell.Run(cmd, TimeSpan.FromSeconds(30));
-                        if (o == null || !o.Contains("ok")) return "Impossibile modificare l'attività pianificata";
+                        if (o == null || !o.Contains("ok")) return "Couldn't change the scheduled task";
                         break;
                     }
                 }

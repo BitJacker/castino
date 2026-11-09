@@ -29,13 +29,13 @@ namespace Lindo.Services
             var regItems = list.Where(i => i.Kind == LeftoverKind.RegistryKey).ToList();
             if (regItems.Count > 0)
             {
-                result.BackupFolder = Path.Combine(SystemInfo.DataFolder, "Backup registro", DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
+                result.BackupFolder = Path.Combine(SystemInfo.DataFolder, "Registry backup", DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
                 Directory.CreateDirectory(result.BackupFolder);
             }
             int n = 0;
             foreach (var item in regItems)
             {
-                progress?.Report("Registro: " + item.Path);
+                progress?.Report("Registry: " + item.Path);
                 if (!RegistryGuard.CanDelete(item.Path))
                 {
                     result.Failed.Add(item.Path + " (protetta)");
@@ -70,7 +70,7 @@ namespace Lindo.Services
             // 3) File, cartelle, collegamenti
             foreach (var item in list.Where(i => i.Kind != LeftoverKind.RegistryKey && i.Kind != LeftoverKind.Driver))
             {
-                progress?.Report("Eliminazione: " + item.Path);
+                progress?.Report("Deleting: " + item.Path);
                 var isDir = Directory.Exists(item.Path);
                 var why = guard.WhyBlocked(item.Path, isDir ? LeftoverKind.Folder : item.Kind);
                 if (why != null)

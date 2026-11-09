@@ -98,77 +98,77 @@ namespace Lindo.Core
     {
         private static readonly Dictionary<string, string> ExceptionCodes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            { "c0000005", "Il programma ha provato a leggere o scrivere memoria non sua (violazione di accesso). Di solito è un bug del programma o di un suo componente aggiuntivo." },
-            { "c0000409", "Il programma si è fermato da solo perché ha rilevato un errore interno grave (buffer overrun). Spesso è un bug del programma." },
-            { "c0000374", "La memoria del programma si è corrotta (heap corruption). Può dipendere da un bug, da un plugin o, raramente, dalla RAM." },
-            { "c00000fd", "Il programma ha esaurito lo spazio dello stack (stack overflow): di solito è un bug." },
-            { "c000001d", "Il processore non riconosce un'istruzione: il programma potrebbe non essere compatibile con questo PC." },
-            { "c0000006", "Non è stato possibile leggere un file del programma dal disco: controlla il disco e reinstalla il programma." },
-            { "c0000142", "Il programma non è riuscito ad avviarsi (errore di inizializzazione di una DLL). Reinstallarlo spesso risolve." },
-            { "c0000135", "Manca una DLL necessaria al programma: reinstallalo o installa i Visual C++ Redistributable." },
-            { "c000041d", "Errore non gestito dentro un callback dell'interfaccia: bug del programma." },
-            { "e0434352", "Errore non gestito in un programma .NET. Aggiornare o reinstallare il programma di solito aiuta." },
-            { "e06d7363", "Errore non gestito in un programma C++: è un bug del programma, prova ad aggiornarlo." },
-            { "80000003", "Il programma ha raggiunto un punto di arresto interno: di solito è un bug." },
-            { "c0000417", "Il programma ha passato parametri non validi a una funzione di sistema: è un bug." },
-            { "c0000602", "Il programma si è chiuso per un errore critico rilevato da sé stesso." },
-            { "cfffffff", "Il programma ha smesso di rispondere ed è stato chiuso." },
+            { "c0000005", "The program tried to read or write memory it doesn't own (access violation). Usually a bug in the program or one of its add-ons." },
+            { "c0000409", "The program stopped itself because it detected a serious internal error (buffer overrun). Often a bug in the program." },
+            { "c0000374", "The program's memory got corrupted (heap corruption). It can be a bug, a plugin or, rarely, the RAM." },
+            { "c00000fd", "The program ran out of stack space (stack overflow): usually a bug." },
+            { "c000001d", "The processor doesn't recognize an instruction: the program may not be compatible with this PC." },
+            { "c0000006", "A program file couldn't be read from the disk: check the disk and reinstall the program." },
+            { "c0000142", "The program failed to start (a DLL failed to initialize). Reinstalling it often fixes it." },
+            { "c0000135", "A DLL the program needs is missing: reinstall it or install the Visual C++ Redistributable." },
+            { "c000041d", "Unhandled error inside a user-interface callback: a bug in the program." },
+            { "e0434352", "Unhandled error in a .NET program. Updating or reinstalling the program usually helps." },
+            { "e06d7363", "Unhandled error in a C++ program: it's a bug in the program, try updating it." },
+            { "80000003", "The program hit an internal breakpoint: usually a bug." },
+            { "c0000417", "The program passed invalid parameters to a system function: it's a bug." },
+            { "c0000602", "The program closed because of a critical error it detected itself." },
+            { "cfffffff", "The program stopped responding and was closed." },
         };
 
         private static readonly (string Pattern, string Hint)[] Modules =
         {
-            ("nvwgf2um", "Il crash avviene nel driver della scheda video NVIDIA: aggiorna (o reinstalla) il driver NVIDIA."),
-            ("nvd3dum", "Il crash avviene nel driver della scheda video NVIDIA: aggiorna (o reinstalla) il driver NVIDIA."),
-            ("nvoglv", "Il crash avviene nel driver OpenGL NVIDIA: aggiorna il driver della scheda video."),
-            ("nvcuda", "Il crash avviene nel driver CUDA NVIDIA: aggiorna il driver della scheda video."),
-            ("atiumd", "Il crash avviene nel driver della scheda video AMD: aggiorna il driver AMD Radeon."),
-            ("amdxx", "Il crash avviene nel driver della scheda video AMD: aggiorna il driver AMD Radeon."),
-            ("atio6axx", "Il crash avviene nel driver OpenGL AMD: aggiorna il driver della scheda video."),
-            ("igd", "Il crash avviene nel driver grafico Intel: aggiorna il driver della scheda video Intel."),
-            ("d3d11", "Il crash avviene nella grafica DirectX 11: aggiorna il driver della scheda video."),
-            ("d3d12", "Il crash avviene nella grafica DirectX 12: aggiorna il driver della scheda video."),
-            ("dxgi", "Il crash riguarda la grafica DirectX: aggiorna il driver della scheda video."),
-            ("vcruntime", "Il crash avviene nelle librerie Visual C++: reinstalla i \"Microsoft Visual C++ Redistributable\"."),
-            ("msvcp", "Il crash avviene nelle librerie Visual C++: reinstalla i \"Microsoft Visual C++ Redistributable\"."),
-            ("ucrtbase", "Il crash è stato segnalato dalla libreria C di Windows, ma la causa è quasi sempre nel programma stesso."),
-            ("clr.dll", "Il crash avviene nel runtime .NET: aggiorna il programma e Windows."),
-            ("coreclr", "Il crash avviene nel runtime .NET: aggiorna il programma."),
-            ("kernelbase", "Il crash è stato segnalato da Windows (KERNELBASE.dll), ma la causa è quasi sempre nel programma stesso."),
-            ("ntdll", "Il crash è stato segnalato da Windows (ntdll.dll), ma la causa è quasi sempre nel programma o in un suo plugin."),
-            ("xinput", "Il crash riguarda il controller di gioco: scollega e ricollega il controller o aggiorna il suo driver."),
-            ("audioses", "Il crash riguarda l'audio: aggiorna il driver audio."),
-            ("unityplayer", "Il crash avviene nel motore del gioco (Unity): aggiorna il gioco e il driver della scheda video."),
-            ("libcef", "Il crash avviene nel browser integrato del programma (CEF): aggiorna il programma."),
+            ("nvwgf2um", "The crash happens in the NVIDIA graphics driver: update (or reinstall) the NVIDIA driver."),
+            ("nvd3dum", "The crash happens in the NVIDIA graphics driver: update (or reinstall) the NVIDIA driver."),
+            ("nvoglv", "The crash happens in the NVIDIA OpenGL driver: update the graphics driver."),
+            ("nvcuda", "The crash happens in the NVIDIA CUDA driver: update the graphics driver."),
+            ("atiumd", "The crash happens in the AMD graphics driver: update the AMD Radeon driver."),
+            ("amdxx", "The crash happens in the AMD graphics driver: update the AMD Radeon driver."),
+            ("atio6axx", "The crash happens in the AMD OpenGL driver: update the graphics driver."),
+            ("igd", "The crash happens in the Intel graphics driver: update the Intel graphics driver."),
+            ("d3d11", "The crash happens in DirectX 11 graphics: update the graphics driver."),
+            ("d3d12", "The crash happens in DirectX 12 graphics: update the graphics driver."),
+            ("dxgi", "The crash involves DirectX graphics: update the graphics driver."),
+            ("vcruntime", "The crash happens in the Visual C++ libraries: reinstall the \"Microsoft Visual C++ Redistributable\"."),
+            ("msvcp", "The crash happens in the Visual C++ libraries: reinstall the \"Microsoft Visual C++ Redistributable\"."),
+            ("ucrtbase", "The crash was reported by the Windows C library, but the cause is almost always in the program itself."),
+            ("clr.dll", "The crash happens in the .NET runtime: update the program and Windows."),
+            ("coreclr", "The crash happens in the .NET runtime: update the program."),
+            ("kernelbase", "The crash was reported by Windows (KERNELBASE.dll), but the cause is almost always in the program itself."),
+            ("ntdll", "The crash was reported by Windows (ntdll.dll), but the cause is almost always in the program or one of its plugins."),
+            ("xinput", "The crash involves the game controller: unplug and replug it or update its driver."),
+            ("audioses", "The crash involves audio: update the audio driver."),
+            ("unityplayer", "The crash happens in the game engine (Unity): update the game and the graphics driver."),
+            ("libcef", "The crash happens in the program's built-in browser (CEF): update the program."),
         };
 
         private static readonly Dictionary<uint, (string Name, string Hint)> BugChecks = new Dictionary<uint, (string, string)>
         {
-            { 0x0000000A, ("IRQL_NOT_LESS_OR_EQUAL", "Un driver ha usato la memoria in modo errato. Aggiorna i driver (soprattutto rete, video e chipset).") },
-            { 0x0000001A, ("MEMORY_MANAGEMENT", "Problema nella gestione della memoria: controlla la RAM con \"Diagnostica memoria Windows\" e aggiorna i driver.") },
-            { 0x0000001E, ("KMODE_EXCEPTION_NOT_HANDLED", "Un driver ha causato un errore: aggiorna i driver installati di recente.") },
-            { 0x0000003B, ("SYSTEM_SERVICE_EXCEPTION", "Errore in un driver o servizio di sistema: aggiorna i driver video e Windows.") },
-            { 0x00000050, ("PAGE_FAULT_IN_NONPAGED_AREA", "Accesso a memoria non valida: può dipendere da un driver, dall'antivirus o dalla RAM.") },
-            { 0x0000007E, ("SYSTEM_THREAD_EXCEPTION_NOT_HANDLED", "Un driver di sistema si è bloccato: aggiorna i driver, soprattutto quello video.") },
-            { 0x0000007F, ("UNEXPECTED_KERNEL_MODE_TRAP", "Errore hardware o di driver: controlla temperature, RAM e overclock.") },
-            { 0x0000009F, ("DRIVER_POWER_STATE_FAILURE", "Un driver non ha gestito bene sospensione/risveglio: aggiorna i driver (spesso rete o USB).") },
-            { 0x000000C5, ("DRIVER_CORRUPTED_EXPOOL", "Un driver ha corrotto la memoria di sistema: aggiorna o rimuovi i driver installati di recente.") },
-            { 0x000000D1, ("DRIVER_IRQL_NOT_LESS_OR_EQUAL", "Un driver (spesso rete o Wi-Fi) ha usato la memoria in modo errato: aggiornalo.") },
-            { 0x000000EF, ("CRITICAL_PROCESS_DIED", "Un processo fondamentale di Windows si è chiuso: esegui \"sfc /scannow\" e controlla il disco.") },
-            { 0x000000F4, ("CRITICAL_OBJECT_TERMINATION", "Un processo fondamentale si è chiuso, spesso per problemi del disco: controlla il disco.") },
-            { 0x00000116, ("VIDEO_TDR_FAILURE", "La scheda video ha smesso di rispondere: aggiorna il driver video e controlla le temperature.") },
-            { 0x00000117, ("VIDEO_TDR_TIMEOUT_DETECTED", "La scheda video ha smesso di rispondere: aggiorna il driver video.") },
-            { 0x00000124, ("WHEA_UNCORRECTABLE_ERROR", "Errore hardware (processore, RAM o alimentazione). Controlla temperature e togli eventuali overclock.") },
-            { 0x00000133, ("DPC_WATCHDOG_VIOLATION", "Un driver o il disco SSD non ha risposto in tempo: aggiorna i driver del disco/chipset e il firmware dell'SSD.") },
-            { 0x00000139, ("KERNEL_SECURITY_CHECK_FAILURE", "Un driver ha corrotto dati del sistema: aggiorna i driver e controlla la RAM.") },
-            { 0x0000013A, ("KERNEL_MODE_HEAP_CORRUPTION", "Un driver ha corrotto la memoria: aggiorna i driver, soprattutto quello video.") },
-            { 0x00000154, ("UNEXPECTED_STORE_EXCEPTION", "Problema col disco o con la memoria: controlla lo stato del disco.") },
-            { 0x000001A5, ("ACPI_BIOS_ERROR", "Problema del BIOS: aggiorna il BIOS della scheda madre.") },
+            { 0x0000000A, ("IRQL_NOT_LESS_OR_EQUAL", "A driver used memory incorrectly. Update your drivers (especially network, graphics and chipset).") },
+            { 0x0000001A, ("MEMORY_MANAGEMENT", "Memory management problem: check the RAM with \"Windows Memory Diagnostic\" and update your drivers.") },
+            { 0x0000001E, ("KMODE_EXCEPTION_NOT_HANDLED", "A driver caused an error: update recently installed drivers.") },
+            { 0x0000003B, ("SYSTEM_SERVICE_EXCEPTION", "Error in a driver or system service: update the graphics drivers and Windows.") },
+            { 0x00000050, ("PAGE_FAULT_IN_NONPAGED_AREA", "Invalid memory access: it can be a driver, the antivirus or the RAM.") },
+            { 0x0000007E, ("SYSTEM_THREAD_EXCEPTION_NOT_HANDLED", "A system driver crashed: update your drivers, especially the graphics one.") },
+            { 0x0000007F, ("UNEXPECTED_KERNEL_MODE_TRAP", "Hardware or driver error: check temperatures, RAM and overclocking.") },
+            { 0x0000009F, ("DRIVER_POWER_STATE_FAILURE", "A driver didn't handle sleep/wake correctly: update your drivers (often network or USB).") },
+            { 0x000000C5, ("DRIVER_CORRUPTED_EXPOOL", "A driver corrupted system memory: update or remove recently installed drivers.") },
+            { 0x000000D1, ("DRIVER_IRQL_NOT_LESS_OR_EQUAL", "A driver (often network or Wi-Fi) used memory incorrectly: update it.") },
+            { 0x000000EF, ("CRITICAL_PROCESS_DIED", "A critical Windows process closed: run \"sfc /scannow\" and check the disk.") },
+            { 0x000000F4, ("CRITICAL_OBJECT_TERMINATION", "A critical process closed, often because of disk problems: check the disk.") },
+            { 0x00000116, ("VIDEO_TDR_FAILURE", "The graphics card stopped responding: update the graphics driver and check temperatures.") },
+            { 0x00000117, ("VIDEO_TDR_TIMEOUT_DETECTED", "The graphics card stopped responding: update the graphics driver.") },
+            { 0x00000124, ("WHEA_UNCORRECTABLE_ERROR", "Hardware error (processor, RAM or power supply). Check temperatures and remove any overclock.") },
+            { 0x00000133, ("DPC_WATCHDOG_VIOLATION", "A driver or the SSD didn't respond in time: update the disk/chipset drivers and the SSD firmware.") },
+            { 0x00000139, ("KERNEL_SECURITY_CHECK_FAILURE", "A driver corrupted system data: update your drivers and check the RAM.") },
+            { 0x0000013A, ("KERNEL_MODE_HEAP_CORRUPTION", "A driver corrupted memory: update your drivers, especially the graphics one.") },
+            { 0x00000154, ("UNEXPECTED_STORE_EXCEPTION", "Disk or memory problem: check the health of the disk.") },
+            { 0x000001A5, ("ACPI_BIOS_ERROR", "BIOS problem: update the motherboard BIOS.") },
         };
 
         public static string ExplainException(string code)
         {
             var c = NormalizeCode(code);
-            return ExceptionCodes.TryGetValue(c, out var t) ? t : "Il programma si è chiuso in modo imprevisto (codice 0x" + c + ").";
+            return ExceptionCodes.TryGetValue(c, out var t) ? t : "The program closed unexpectedly (code 0x" + c + ").";
         }
 
         public static string ExplainModule(string module)
@@ -183,7 +183,7 @@ namespace Lindo.Core
         public static (string Name, string Hint) ExplainBugCheck(uint code)
         {
             if (BugChecks.TryGetValue(code, out var v)) return v;
-            return ("0x" + code.ToString("X8"), "Schermata blu: aggiorna Windows e i driver; se si ripete, controlla RAM e temperature.");
+            return ("0x" + code.ToString("X8"), "Blue screen: update Windows and your drivers; if it happens again, check RAM and temperatures.");
         }
 
         /// <summary>Estrae il codice numerico da testi come "0x0000001a" o "0x1a (0x..., ...)".</summary>

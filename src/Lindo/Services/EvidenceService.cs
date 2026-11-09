@@ -39,7 +39,7 @@ namespace Lindo.Services
                         var value = kv.Value?.ToString() ?? "";
                         if (name.Equals("TEMP", StringComparison.OrdinalIgnoreCase) || name.Equals("TMP", StringComparison.OrdinalIgnoreCase)) continue;
                         foreach (var part in value.Split(';'))
-                            if (part.Length > 3 && part[1] == ':') ev.Add(part, "Variabile d'ambiente " + name);
+                            if (part.Length > 3 && part[1] == ':') ev.Add(part, "Environment variable " + name);
                     }
                 }
                 catch { }
@@ -55,7 +55,7 @@ namespace Lindo.Services
                             using (var s = services.OpenSubKey(n))
                             {
                                 var img = s?.GetValue("ImagePath")?.ToString();
-                                if (!string.IsNullOrEmpty(img)) ev.Add(WinPath.ExtractExecutable(Environment.ExpandEnvironmentVariables(img)), "Servizio " + n);
+                                if (!string.IsNullOrEmpty(img)) ev.Add(WinPath.ExtractExecutable(Environment.ExpandEnvironmentVariables(img)), "Service " + n);
                             }
                         }
                         catch { }
@@ -74,7 +74,7 @@ namespace Lindo.Services
                 {
                     using (var k = hive.OpenSubKey(key))
                         foreach (var v in k?.GetValueNames() ?? new string[0])
-                            ev.Add(WinPath.ExtractExecutable(Environment.ExpandEnvironmentVariables(k.GetValue(v)?.ToString() ?? "")), "Avvio automatico");
+                            ev.Add(WinPath.ExtractExecutable(Environment.ExpandEnvironmentVariables(k.GetValue(v)?.ToString() ?? "")), "Starts with Windows");
                 }
                 catch { }
             }
@@ -104,7 +104,7 @@ namespace Lindo.Services
                     {
                         var sb = new StringBuilder(1024);
                         int size = sb.Capacity;
-                        if (QueryFullProcessImageName(h, 0, sb, ref size)) ev.Add(sb.ToString(0, size), "In esecuzione: " + p.ProcessName);
+                        if (QueryFullProcessImageName(h, 0, sb, ref size)) ev.Add(sb.ToString(0, size), "Running: " + p.ProcessName);
                     }
                     finally { CloseHandle(h); }
                 }
@@ -121,7 +121,7 @@ namespace Lindo.Services
                 {
                     if (!Directory.Exists(dir)) continue;
                     foreach (var lnk in Directory.EnumerateFiles(dir, "*.lnk", SearchOption.AllDirectories).Take(800))
-                        ev.Add(ShortcutResolver.Resolve(lnk), "Collegamento " + Path.GetFileNameWithoutExtension(lnk));
+                        ev.Add(ShortcutResolver.Resolve(lnk), "Shortcut " + Path.GetFileNameWithoutExtension(lnk));
                 }
                 catch { }
             }
@@ -129,7 +129,7 @@ namespace Lindo.Services
             // Programmi visti dal monitor di Lindo negli ultimi N giorni
             var store = UsageService.LoadStore();
             foreach (var r in store.Records.Values.Where(r => DateTime.Now - r.LastSeen < TimeSpan.FromDays(recentDays)))
-                ev.Add(r.Path, "Usato di recente (" + TimeText.Ago(r.LastSeen, DateTime.Now) + ")");
+                ev.Add(r.Path, "Used recently (" + TimeText.Ago(r.LastSeen, DateTime.Now) + ")");
 
             Log.Write("Indizi d'uso raccolti: " + ev.InUsePaths.Count);
             return ev;

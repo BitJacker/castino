@@ -148,7 +148,7 @@ namespace Lindo.Services
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(exe) || !File.Exists(exe)) return "File non trovato";
+                if (string.IsNullOrWhiteSpace(exe) || !File.Exists(exe)) return "File not found";
                 using (var k = Registry.CurrentUser.CreateSubKey(GpuPrefKey))
                 {
                     OptimizeService.RememberValue("gpupref|" + exe, k.GetValue(exe) as string);

@@ -78,12 +78,12 @@ namespace Lindo
                 var parts = new List<string>();
                 if (!string.IsNullOrWhiteSpace(Info.Publisher)) parts.Add(Info.Publisher);
                 if (!string.IsNullOrWhiteSpace(Info.Version)) parts.Add("v" + Info.Version.TrimStart('v', 'V'));
-                if (parts.Count == 0) parts.Add(IsStore ? "Microsoft Store" : "Programma desktop");
+                if (parts.Count == 0) parts.Add(IsStore ? "Microsoft Store" : "Desktop program");
                 return string.Join("  ·  ", parts);
             }
         }
 
-        public string DateText => Info.InstallDate.HasValue ? Info.InstallDate.Value.ToString("d MMM yyyy", new System.Globalization.CultureInfo("it-IT")) : "—";
+        public string DateText => Info.InstallDate.HasValue ? Info.InstallDate.Value.ToString("d MMM yyyy", new System.Globalization.CultureInfo("en-US")) : "—";
 
         public ImageSource Icon
         {
@@ -135,21 +135,21 @@ namespace Lindo
             (!Info.LastUsed.HasValue || DateTime.Now - Info.LastUsed.Value > TimeSpan.FromDays(60)) &&
             (!Info.InstallDate.HasValue || DateTime.Now - Info.InstallDate.Value > TimeSpan.FromDays(30));
 
-        public string ColumnLabel => IsDriver ? "Dispositivo" : "Ultimo uso";
+        public string ColumnLabel => IsDriver ? "Device" : "Last used";
 
         public string ColumnText
         {
             get
             {
                 if (IsDriver)
-                    return Info.DriverIsCritical ? "Di sistema" : string.IsNullOrEmpty(Info.DriverInUseBy) ? "Non collegato" : "In uso";
-                return Info.LastUsed.HasValue ? TimeText.Ago(Info.LastUsed.Value, DateTime.Now) : "Nessun uso registrato";
+                    return Info.DriverIsCritical ? "System" : string.IsNullOrEmpty(Info.DriverInUseBy) ? "Not connected" : "In use";
+                return Info.LastUsed.HasValue ? TimeText.Ago(Info.LastUsed.Value, DateTime.Now) : "No recorded use";
             }
         }
 
         public string ColumnTooltip => IsDriver
-            ? (string.IsNullOrEmpty(Info.DriverInUseBy) ? "Nessun dispositivo collegato usa questo driver" : "Usato da: " + Info.DriverInUseBy)
-            : "Installata: " + DateText;
+            ? (string.IsNullOrEmpty(Info.DriverInUseBy) ? "No connected device uses this driver" : "Used by: " + Info.DriverInUseBy)
+            : "Installed: " + DateText;
 
         public void RefreshUsage()
         {
@@ -167,7 +167,7 @@ namespace Lindo
         public long Free { get; set; }
         public long Total { get; set; }
         public string FreeText => SizeFormat.Format(Free);
-        public string Detail => "liberi su " + SizeFormat.Format(Total);
+        public string Detail => "free of " + SizeFormat.Format(Total);
         public double UsedRatio => Total > 0 ? 1.0 - (double)Free / Total : 0;
         public bool IsLow => Total > 0 && (double)Free / Total < 0.08;
         public bool IsSelected { get => _isSelected; set => Set(ref _isSelected, value); }
@@ -191,7 +191,7 @@ namespace Lindo
         public bool IsEssential => Entry.IsEssential;
         public bool IsSuggested => Entry.Suggested && _enabled;
         public bool IsService => Entry.Kind == Services.StartupKind.Service;
-        public string StateText => _enabled ? "Si avvia con Windows" : (IsService ? "Avvio manuale" : "Disattivata");
+        public string StateText => _enabled ? "Starts with Windows" : (IsService ? "Manual start" : "Disabled");
 
         public bool Enabled
         {
@@ -247,7 +247,7 @@ namespace Lindo
             set { if (Set(ref _isApplied, value)) Raise(nameof(StateText)); }
         }
 
-        public string StateText => !Reversible ? "Una tantum" : _isApplied ? "Già ottimizzato" : "Da ottimizzare";
+        public string StateText => !Reversible ? "One-off" : _isApplied ? "Already optimized" : "To optimize";
     }
 
     public sealed class CrashItem
@@ -256,14 +256,14 @@ namespace Lindo
         internal CrashItem(Services.CrashGroup g) { Group = g; }
         public string Title => Group.Title;
         public string Kind => Group.Kind;
-        public string When => (Group.Count == 1 ? "1 volta" : Group.Count + " volte") + "  ·  ultima " + Core.TimeText.Ago(Group.Last, DateTime.Now) +
-                              " (" + Group.Last.ToString("d MMM HH:mm", new System.Globalization.CultureInfo("it-IT")) + ")";
+        public string When => (Group.Count == 1 ? "once" : Group.Count + " times") + "  ·  last " + Core.TimeText.Ago(Group.Last, DateTime.Now) +
+                              " (" + Group.Last.ToString("d MMM HH:mm", new System.Globalization.CultureInfo("en-US")) + ")";
         public string Explanation => Group.Explanation;
         public string Advice => Group.Advice;
         public string Details => Group.Details;
         public bool HasDetails => !string.IsNullOrEmpty(Group.Details);
         public bool IsSystem => Group.IsSystem;
-        public string Glyph => Group.Kind == "Schermata blu" ? "\uE7BA" : Group.Kind == "Spegnimento" ? "\uE7E8" : Group.Kind == "Blocco" ? "\uE916" : "\uE783";
+        public string Glyph => Group.Kind == "Blue screen" ? "\uE7BA" : Group.Kind == "Shutdown" ? "\uE7E8" : Group.Kind == "Hang" ? "\uE916" : "\uE783";
     }
 
     public sealed class LeftoverItem : Observable
@@ -279,7 +279,7 @@ namespace Lindo
         }
 
         /// <summary>Etichetta del gruppo nella pagina Residui.</summary>
-        public string Group => Model.Confidence == Confidence.High ? "Sicuri da eliminare" : "Da controllare";
+        public string Group => Model.Confidence == Confidence.High ? "Safe to delete" : "Check first";
         public bool IsSafe => Model.Confidence == Confidence.High;
 
         public Leftover Model { get; }
@@ -302,11 +302,11 @@ namespace Lindo
             {
                 switch (Model.Kind)
                 {
-                    case LeftoverKind.RegistryKey: return "Registro";
+                    case LeftoverKind.RegistryKey: return "Registry";
                     case LeftoverKind.Driver: return "Driver";
-                    case LeftoverKind.Shortcut: return "Collegamento";
+                    case LeftoverKind.Shortcut: return "Shortcut";
                     case LeftoverKind.File: return "File";
-                    default: return "Cartella";
+                    default: return "Folder";
                 }
             }
         }
@@ -327,8 +327,8 @@ namespace Lindo
         }
 
         public string ConfidenceText =>
-            Model.Confidence == Confidence.High ? "Sicuro" :
-            Model.Confidence == Confidence.Medium ? "Probabile" : "Da verificare";
+            Model.Confidence == Confidence.High ? "Safe" :
+            Model.Confidence == Confidence.Medium ? "Likely" : "Check";
 
         public string ConfidenceKey => Model.Confidence.ToString();
 
@@ -341,7 +341,7 @@ namespace Lindo
         public string SizeText => Model.Kind == LeftoverKind.RegistryKey ? "" : SizeFormat.Format(_sizeBytes);
 
         public string DateText => Model.LastModified.HasValue
-            ? Model.LastModified.Value.ToString("d MMM yyyy", new System.Globalization.CultureInfo("it-IT"))
+            ? Model.LastModified.Value.ToString("d MMM yyyy", new System.Globalization.CultureInfo("en-US"))
             : string.Empty;
     }
 
@@ -369,6 +369,6 @@ namespace Lindo
             set { if (Set(ref _sizeBytes, value)) Raise(nameof(SizeText)); }
         }
 
-        public string SizeText => _sizeBytes < 0 ? "Calcolo…" : _sizeBytes == 0 ? "Già pulito" : SizeFormat.Format(_sizeBytes);
+        public string SizeText => _sizeBytes < 0 ? "Calculating…" : _sizeBytes == 0 ? "Already clean" : SizeFormat.Format(_sizeBytes);
     }
 }

@@ -149,8 +149,8 @@ namespace Lindo.Services
                     DisplayName = drv.Name + " (" + (string.IsNullOrEmpty(drv.DriverClass) ? "driver" : drv.DriverClass) + ")",
                     SizeBytes = drv.EstimatedSizeBytes,
                     Confidence = inUse ? Confidence.Low : (s == MatchStrength.Strong ? Confidence.High : Confidence.Medium),
-                    Reason = inUse ? "Driver di " + drv.Publisher + " usato da: " + drv.DriverInUseBy
-                                   : "Driver di " + drv.Publisher + " (nessun dispositivo collegato lo usa)",
+                    Reason = inUse ? "Driver by " + drv.Publisher + " used by: " + drv.DriverInUseBy
+                                   : "Driver by " + drv.Publisher + " (no connected device uses it)",
                 });
             }
             return list;
@@ -163,11 +163,11 @@ namespace Lindo.Services
                 !publishedInf.StartsWith("oem", StringComparison.OrdinalIgnoreCase) ||
                 !publishedInf.EndsWith(".inf", StringComparison.OrdinalIgnoreCase) ||
                 publishedInf.IndexOfAny(new[] { '\\', '/', '"', ' ' }) >= 0)
-                return "Nome driver non valido";
+                return "Invalid driver name";
 
             // Ultimo controllo: mai i driver di classi critiche
             var known = ScanWithInfo(refresh: false).FirstOrDefault(x => x.App.DriverInf.Equals(publishedInf, StringComparison.OrdinalIgnoreCase));
-            if (known.App != null && known.App.DriverIsCritical) return "Driver di sistema: non viene rimosso";
+            if (known.App != null && known.App.DriverIsCritical) return "System driver: not removed";
 
             try
             {
@@ -185,7 +185,7 @@ namespace Lindo.Services
                     p.WaitForExit(120000);
                     Log.Write("pnputil " + publishedInf + " → " + p.ExitCode + " " + output.Trim());
                     if (p.ExitCode == 0 || p.ExitCode == 3010) { _cache = null; return null; }
-                    return output.Trim().Split('\n').LastOrDefault()?.Trim() ?? ("codice " + p.ExitCode);
+                    return output.Trim().Split('\n').LastOrDefault()?.Trim() ?? ("code " + p.ExitCode);
                 }
             }
             catch (Exception ex)

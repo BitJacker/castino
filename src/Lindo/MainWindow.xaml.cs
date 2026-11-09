@@ -183,8 +183,8 @@ namespace Lindo
             var tag = current?.Tag as string;
             _suppressDriveEvent = true;
             DriveBox.Items.Clear();
-            DriveBox.Items.Add(new ComboBoxItem { Content = "Tutti i dischi", Tag = "" });
-            foreach (var d in _drives) DriveBox.Items.Add(new ComboBoxItem { Content = "Disco " + d.Letter, Tag = d.Letter });
+            DriveBox.Items.Add(new ComboBoxItem { Content = "All drives", Tag = "" });
+            foreach (var d in _drives) DriveBox.Items.Add(new ComboBoxItem { Content = "Drive " + d.Letter, Tag = d.Letter });
             DriveBox.SelectedItem = DriveBox.Items.Cast<ComboBoxItem>().FirstOrDefault(x => (x.Tag as string) == (tag ?? "")) ?? DriveBox.Items[0];
             _suppressDriveEvent = false;
         }
@@ -244,7 +244,7 @@ namespace Lindo
             _sizeCts?.Cancel();
             AppsLoading.Visibility = Visibility.Visible;
             AppsEmpty.Visibility = Visibility.Collapsed;
-            AppsSummary.Text = "Analisi in corso…";
+            AppsSummary.Text = "Scanning…";
             try
             {
                 _allInfos = await ScanAllAsync(includeDrivers: true);
@@ -266,7 +266,7 @@ namespace Lindo
             catch (Exception ex)
             {
                 Log.Write("Errore caricamento app: " + ex);
-                AppsSummary.Text = "Impossibile leggere l'elenco delle app: " + ex.Message;
+                AppsSummary.Text = "Couldn't read the app list: " + ex.Message;
                 AppsLoading.Visibility = Visibility.Collapsed;
             }
             finally
@@ -349,9 +349,9 @@ namespace Lindo
             var store = _apps.Count(a => a.IsStore);
             var drivers = _apps.Count(a => a.IsDriver);
             var unused = _apps.Count(a => a.IsUnused);
-            AppsSummary.Text = $"{_apps.Count - store - drivers} programmi, {store} app dello Store e {drivers} driver · scegli cosa togliere e Lindo pulisce anche i residui";
-            FilterUnusedText.Text = unused > 0 ? "Non usate (" + unused + ")" : "Non usate";
-            UnusedLink.Text = unused > 0 ? "Vedi le " + unused + " app che non usi da 2 mesi →" : "Vedi le app che non usi →";
+            AppsSummary.Text = $"{_apps.Count - store - drivers} programs, {store} Store apps and {drivers} drivers · pick what to remove and Lindo cleans up the leftovers too";
+            FilterUnusedText.Text = unused > 0 ? "Unused (" + unused + ")" : "Unused";
+            UnusedLink.Text = unused > 0 ? "See the " + unused + " apps you haven't used in 2 months →" : "See the apps you don't use →";
         }
 
         private bool FilterApp(object o)
@@ -435,7 +435,7 @@ namespace Lindo
         private void OnDialogCancel(object sender, RoutedEventArgs e) => CloseDialog();
 
         private void ShowResult(string title, string subtitle, IEnumerable<CheckLine> checks, bool success,
-            string primaryText = "Fatto", Action primary = null, string secondaryText = null, Action secondary = null, bool danger = false)
+            string primaryText = "Done", Action primary = null, string secondaryText = null, Action secondary = null, bool danger = false)
         {
             DlgResultTitle.Text = title;
             DlgResultSubtitle.Text = subtitle ?? "";
@@ -471,8 +471,8 @@ namespace Lindo
         {
             var sel = _apps.Where(a => a.IsChecked).ToList();
             AppsSelectionBar.Visibility = sel.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-            AppsSelectionText.Text = sel.Count == 1 ? "1 app selezionata · " + SizeFormat.Format(sel[0].SizeBytes)
-                : sel.Count + " app selezionate · " + SizeFormat.Format(sel.Sum(a => a.SizeBytes));
+            AppsSelectionText.Text = sel.Count == 1 ? "1 app selected · " + SizeFormat.Format(sel[0].SizeBytes)
+                : sel.Count + " apps selected · " + SizeFormat.Format(sel.Sum(a => a.SizeBytes));
         }
 
         private void OnClearAppSelection(object sender, RoutedEventArgs e)
@@ -507,12 +507,12 @@ namespace Lindo
                 DlgAvatar.Background = (Brush)FindResource("Accent");
                 DlgInitials.Text = items.Count.ToString();
                 DlgIconHost.Visibility = Visibility.Collapsed;
-                DlgAppName.Text = items.Count + " app da disinstallare";
-                var names = string.Join(", ", items.Take(4).Select(a => a.Name)) + (items.Count > 4 ? $" e altre {items.Count - 4}" : "");
+                DlgAppName.Text = items.Count + " apps to uninstall";
+                var names = string.Join(", ", items.Take(4).Select(a => a.Name)) + (items.Count > 4 ? $" and {items.Count - 4} more" : "");
                 DlgAppMeta.Text = names + "  ·  " + SizeFormat.Format(items.Sum(a => a.SizeBytes));
                 DlgNoUninstaller.Visibility = items.Any(a => !Uninstaller.HasWorkingUninstaller(a.Info) && !a.IsDriver) ? Visibility.Visible : Visibility.Collapsed;
-                DlgConfirmText.Text = "Disinstalla " + items.Count + " app";
-                DlgStep1.Text = "Avvio i programmi di disinstallazione uno alla volta.";
+                DlgConfirmText.Text = "Uninstall " + items.Count + " apps";
+                DlgStep1.Text = "I'll start the uninstallers one at a time.";
             }
             else
             {
@@ -524,17 +524,17 @@ namespace Lindo
                 DlgAppName.Text = info.Name;
                 var meta = new List<string>();
                 if (!string.IsNullOrWhiteSpace(info.Publisher)) meta.Add(info.Publisher);
-                if (item.SizeBytes > 0) meta.Add((item.SizeIsExact || item.IsDriver ? "" : "circa ") + SizeFormat.Format(item.SizeBytes));
-                if (item.IsDriver && !string.IsNullOrEmpty(info.DriverInUseBy)) meta.Add("usato da " + info.DriverInUseBy);
+                if (item.SizeBytes > 0) meta.Add((item.SizeIsExact || item.IsDriver ? "" : "about ") + SizeFormat.Format(item.SizeBytes));
+                if (item.IsDriver && !string.IsNullOrEmpty(info.DriverInUseBy)) meta.Add("used by " + info.DriverInUseBy);
                 DlgAppMeta.Text = string.Join("  ·  ", meta);
 
                 var works = item.IsDriver || Uninstaller.HasWorkingUninstaller(info);
                 DlgNoUninstaller.Visibility = works ? Visibility.Collapsed : Visibility.Visible;
-                DlgConfirmText.Text = item.IsDriver ? "Rimuovi driver" : works ? "Disinstalla" : "Rimozione forzata";
-                DlgStep1.Text = item.IsDriver ? "Rimuovo il driver con lo strumento di Windows (pnputil)."
-                             : !works ? "Il disinstallatore manca: passo direttamente alla pulizia."
-                             : info.Source == AppSource.Store ? "Rimuovo l'app tramite Windows (come dal menu Start)."
-                             : "Avvio il programma di disinstallazione ufficiale dell'app.";
+                DlgConfirmText.Text = item.IsDriver ? "Remove driver" : works ? "Uninstall" : "Force removal";
+                DlgStep1.Text = item.IsDriver ? "I'll remove the driver with the Windows tool (pnputil)."
+                             : !works ? "The uninstaller is missing: I'll go straight to the cleanup."
+                             : info.Source == AppSource.Store ? "I'll remove the app through Windows (like from the Start menu)."
+                             : "I'll start the app's official uninstaller.";
             }
             ShowPanel(DlgConfirm);
         }
@@ -552,11 +552,11 @@ namespace Lindo
                 var item = batch[i];
                 var info = item.Info;
                 _current = item;
-                var prefix = multi ? $"{i + 1} di {batch.Count} · " : "";
+                var prefix = multi ? $"{i + 1} of {batch.Count} · " : "";
 
                 if (item.IsDriver)
                 {
-                    DlgRunningTitle.Text = prefix + "Rimozione del driver";
+                    DlgRunningTitle.Text = prefix + "Removing the driver";
                     DlgRunningText.Text = info.Name;
                     DlgSkipWait.Visibility = Visibility.Collapsed;
                     ShowPanel(DlgRunning);
@@ -568,13 +568,13 @@ namespace Lindo
                 if (!Uninstaller.HasWorkingUninstaller(info))
                 {
                     forced.Add(item);
-                    _batchNotes[item] = "forzata";
+                    _batchNotes[item] = "forced";
                     continue;
                 }
 
-                DlgRunningTitle.Text = prefix + "Disinstallazione di " + info.Name;
-                DlgRunningText.Text = "Avvio…";
-                DlgSkipWait.Content = multi && i < batch.Count - 1 ? "Ho finito, passa alla prossima" : "Ho finito, cerca i residui";
+                DlgRunningTitle.Text = prefix + "Uninstalling " + info.Name;
+                DlgRunningText.Text = "Starting…";
+                DlgSkipWait.Content = multi && i < batch.Count - 1 ? "I'm done, go to the next one" : "I'm done, find leftovers";
                 DlgSkipWait.Visibility = Visibility.Visible;
                 ShowPanel(DlgRunning);
 
@@ -587,32 +587,32 @@ namespace Lindo
 
                 if (!multi && outcome == UninstallOutcome.StillInstalled)
                 {
-                    ShowResult("La disinstallazione non è stata completata",
-                        "Il programma risulta ancora installato. Forse hai annullato la procedura, oppure serve un riavvio.",
-                        new[] { CheckLine.Info("Puoi riprovare, oppure fare una rimozione forzata: Lindo elimina direttamente i file e la voce dall'elenco.") },
-                        success: false, primaryText: "Chiudi", primary: CloseDialog,
-                        secondaryText: "Rimozione forzata", secondary: async () => await ScanBatchLeftoversAsync(new List<AppItem> { item }, true));
+                    ShowResult("The uninstall wasn't completed",
+                        "The program still shows as installed. Maybe you cancelled the uninstaller, or a restart is needed.",
+                        new[] { CheckLine.Info("You can try again, or do a force removal: Lindo deletes the files and the list entry directly.") },
+                        success: false, primaryText: "Close", primary: CloseDialog,
+                        secondaryText: "Force removal", secondary: async () => await ScanBatchLeftoversAsync(new List<AppItem> { item }, true));
                     return;
                 }
                 if (!multi && outcome == UninstallOutcome.NoUninstaller)
                 {
-                    ShowResult("Impossibile avviare il disinstallatore", "Il programma di disinstallazione non si è avviato.",
-                        new[] { CheckLine.Info("Puoi fare una rimozione forzata: Lindo elimina direttamente i file rimasti e la voce dall'elenco.") },
-                        success: false, primaryText: "Rimozione forzata", primary: async () => await ScanBatchLeftoversAsync(new List<AppItem> { item }, true),
-                        secondaryText: "Annulla", secondary: CloseDialog);
+                    ShowResult("Couldn't start the uninstaller", "The uninstaller didn't start.",
+                        new[] { CheckLine.Info("You can do a force removal: Lindo deletes the leftover files and the list entry directly.") },
+                        success: false, primaryText: "Force removal", primary: async () => await ScanBatchLeftoversAsync(new List<AppItem> { item }, true),
+                        secondaryText: "Cancel", secondary: CloseDialog);
                     return;
                 }
-                _batchNotes[item] = outcome == UninstallOutcome.StillInstalled ? "ancora installata" : outcome == UninstallOutcome.NoUninstaller ? "non avviato" : "ok";
+                _batchNotes[item] = outcome == UninstallOutcome.StillInstalled ? "still installed" : outcome == UninstallOutcome.NoUninstaller ? "not started" : "ok";
             }
 
             var appsToScan = batch.Where(b => !b.IsDriver).ToList();
             if (appsToScan.Count == 0)
             {
                 var checks = batch.Select(b => _batchNotes.TryGetValue(b, out var n) && n == "ok"
-                    ? CheckLine.Ok("Driver rimosso: " + b.Name) : CheckLine.Fail(b.Name + ": " + (_batchNotes.TryGetValue(b, out var m) ? m : "errore"))).ToList();
+                    ? CheckLine.Ok("Driver removed: " + b.Name) : CheckLine.Fail(b.Name + ": " + (_batchNotes.TryGetValue(b, out var m) ? m : "error"))).ToList();
                 UpdateDisk();
                 _ = LoadAppsAsync();
-                ShowResult(checks.All(c => c.Glyph == "") ? "Driver rimossi" : "Rimozione dei driver", null, checks, success: checks.All(c => c.Glyph == ""));
+                ShowResult(checks.All(c => c.Glyph == "") ? "Drivers removed" : "Driver removal", null, checks, success: checks.All(c => c.Glyph == ""));
                 return;
             }
             await ScanBatchLeftoversAsync(appsToScan, forced.Count == appsToScan.Count);
@@ -651,8 +651,8 @@ namespace Lindo
             _scanned = items;
             _wasForced = forced;
             var multi = items.Count > 1;
-            DlgRunningTitle.Text = multi ? "Cerco i residui di " + items.Count + " app" : "Cerco i residui di " + items[0].Info.Name;
-            DlgRunningText.Text = "Controllo Programmi, AppData, ProgramData, menu Start, Desktop, registro e driver collegati…";
+            DlgRunningTitle.Text = multi ? "Looking for leftovers of " + items.Count + " apps" : "Looking for leftovers of " + items[0].Info.Name;
+            DlgRunningText.Text = "Checking Program Files, AppData, ProgramData, Start menu, Desktop, registry and related drivers…";
             DlgSkipWait.Visibility = Visibility.Collapsed;
             ShowPanel(DlgRunning);
 
@@ -688,7 +688,7 @@ namespace Lindo
             catch (Exception ex)
             {
                 Log.Write("Ricerca residui fallita: " + ex);
-                ShowResult("Ricerca dei residui non riuscita", ex.Message, null, success: false);
+                ShowResult("The leftover search failed", ex.Message, null, success: false);
                 return;
             }
 
@@ -701,21 +701,21 @@ namespace Lindo
                 _dlgLeftovers.Add(vm);
             }
 
-            var names = multi ? items.Count + " app" : items[0].Info.Name;
+            var names = multi ? items.Count + " apps" : items[0].Info.Name;
             if (_dlgLeftovers.Count == 0)
             {
                 _ = LoadAppsAsync();
                 UpdateDisk();
                 var any = stillInstalled.Count > 0;
-                ShowResult(any ? "Nessun residuo trovato" : "Disinstallazione completata",
-                    any ? "Alcuni programmi risultano però ancora installati." : names + (multi ? " rimosse" : " è stato rimosso") + " completamente.",
+                ShowResult(any ? "No leftovers found" : "Uninstall complete",
+                    any ? "But some programs still show as installed." : names + (multi ? " were" : " was") + " removed completely.",
                     new[]
                     {
-                        any ? CheckLine.Warn("Ancora nell'elenco delle app: " + string.Join(", ", stillInstalled.Select(x => x.Name)))
-                            : CheckLine.Ok("Rimosso dall'elenco delle app"),
-                        CheckLine.Ok("Nessuna cartella rimasta in Programmi, AppData e ProgramData"),
-                        CheckLine.Ok("Nessun collegamento nel menu Start o sul Desktop"),
-                        CheckLine.Ok("Nessuna chiave di registro né driver rimasti"),
+                        any ? CheckLine.Warn("Still in the app list: " + string.Join(", ", stillInstalled.Select(x => x.Name)))
+                            : CheckLine.Ok("Removed from the app list"),
+                        CheckLine.Ok("No folders left in Program Files, AppData and ProgramData"),
+                        CheckLine.Ok("No shortcuts in the Start menu or on the Desktop"),
+                        CheckLine.Ok("No registry keys or drivers left"),
                     }, success: !any);
                 return;
             }
@@ -725,17 +725,17 @@ namespace Lindo
             if (drivers.Count > 0)
             {
                 var anyInUse = drivers.Any(d => d.Model.Confidence == Confidence.Low);
-                DlgDriverText.Text = $"Ho trovato {drivers.Count} driver collegati a {names} (per esempio {drivers[0].Model.DisplayName}). Vuoi eliminare anche i driver?" +
-                                     (anyInUse ? " Attenzione: alcuni sono usati da un dispositivo collegato, che smetterà di funzionare finché non reinstalli il driver." : "");
+                DlgDriverText.Text = $"I found {drivers.Count} drivers related to {names} (for example {drivers[0].Model.DisplayName}). Do you want to delete the drivers too?" +
+                                     (anyInUse ? " Warning: some are used by a connected device, which will stop working until you reinstall the driver." : "");
                 _syncing = true;
                 DlgDriverCheck.IsChecked = false;
                 _syncing = false;
             }
 
             var total = found.Sum(f => f.SizeBytes);
-            DlgLeftoversTitle.Text = forced ? "Rimozione forzata di " + names : "Ecco cosa è rimasto di " + names;
-            DlgLeftoversText.Text = $"{found.Count} elementi · {SizeFormat.Format(total)}. " +
-                                    "Gli elementi «Sicuro» e «Probabile» sono già selezionati; quelli «Da verificare» decidili tu.";
+            DlgLeftoversTitle.Text = forced ? "Force removal of " + names : "Here's what's left of " + names;
+            DlgLeftoversText.Text = $"{found.Count} items · {SizeFormat.Format(total)}. " +
+                                    "«Safe» and «Likely» items are already selected; you decide about the «Check» ones.";
             UpdateDlgSelection();
             ShowPanel(DlgLeftovers);
         }
@@ -759,8 +759,8 @@ namespace Lindo
         {
             var sel = _dlgLeftovers.Where(l => l.IsSelected).ToList();
             DlgDeleteButton.IsEnabled = sel.Count > 0;
-            DlgDeleteText.Text = sel.Count == 0 ? "Elimina selezionati"
-                : $"Elimina {sel.Count} " + (sel.Count == 1 ? "elemento" : "elementi") +
+            DlgDeleteText.Text = sel.Count == 0 ? "Delete selected"
+                : $"Delete {sel.Count} " + (sel.Count == 1 ? "item" : "items") +
                   (sel.Sum(l => l.SizeBytes) > 0 ? " · " + SizeFormat.Format(sel.Sum(l => l.SizeBytes)) : "");
             _syncing = true;
             try
@@ -781,11 +781,11 @@ namespace Lindo
 
         private void OnSkipLeftovers(object sender, RoutedEventArgs e)
         {
-            var names = _scanned.Count > 1 ? _scanned.Count + " app" : _current?.Info.Name;
+            var names = _scanned.Count > 1 ? _scanned.Count + " apps" : _current?.Info.Name;
             _ = LoadAppsAsync();
             UpdateDisk();
-            ShowResult("Fatto", names != null ? "Non ho eliminato nessun residuo di " + names + "." : null,
-                new[] { CheckLine.Info("Potrai ritrovarli in qualsiasi momento in «Residui e verifica».") }, success: true);
+            ShowResult("Done", names != null ? "I didn't delete any leftovers of " + names + "." : null,
+                new[] { CheckLine.Info("You can find them again at any time in «Leftovers».") }, success: true);
         }
 
         private async void OnDeleteLeftovers(object sender, RoutedEventArgs e)
@@ -794,8 +794,8 @@ namespace Lindo
             var selected = _dlgLeftovers.Where(l => l.IsSelected).Select(l => l.Model).ToList();
             if (items.Count == 0 || selected.Count == 0) return;
 
-            DlgRunningTitle.Text = "Pulizia in corso";
-            DlgRunningText.Text = "Elimino i residui selezionati…";
+            DlgRunningTitle.Text = "Cleaning up";
+            DlgRunningText.Text = "Deleting the selected leftovers…";
             DlgSkipWait.Visibility = Visibility.Collapsed;
             ShowPanel(DlgRunning);
 
@@ -809,31 +809,31 @@ namespace Lindo
             var remainingSelected = remaining.Count(r => selected.Any(s => string.Equals(s.Path, r.Path, StringComparison.OrdinalIgnoreCase)));
 
             var checks = new List<CheckLine>();
-            checks.Add(still.Count > 0 ? CheckLine.Warn("Ancora nell'elenco delle app: " + string.Join(", ", still.Select(x => x.Name)))
-                                       : CheckLine.Ok(items.Count > 1 ? "Tutte le " + items.Count + " app rimosse dall'elenco" : "Programma rimosso dall'elenco delle app"));
-            checks.Add(CheckLine.Ok($"{result.Deleted} {(result.Deleted == 1 ? "elemento eliminato" : "elementi eliminati")}"));
+            checks.Add(still.Count > 0 ? CheckLine.Warn("Still in the app list: " + string.Join(", ", still.Select(x => x.Name)))
+                                       : CheckLine.Ok(items.Count > 1 ? "All " + items.Count + " apps removed from the list" : "Program removed from the app list"));
+            checks.Add(CheckLine.Ok($"{result.Deleted} {(result.Deleted == 1 ? "item deleted" : "items deleted")}"));
             var driversDeleted = selected.Count(x => x.Kind == LeftoverKind.Driver) - result.Failed.Count(f => selected.Any(x => x.Kind == LeftoverKind.Driver && f.StartsWith(x.DisplayName)));
-            if (selected.Any(x => x.Kind == LeftoverKind.Driver)) checks.Add(CheckLine.Ok($"Driver rimossi: {Math.Max(0, driversDeleted)}"));
+            if (selected.Any(x => x.Kind == LeftoverKind.Driver)) checks.Add(CheckLine.Ok($"Drivers removed: {Math.Max(0, driversDeleted)}"));
             if (result.ScheduledOnReboot > 0)
-                checks.Add(CheckLine.Warn($"{result.ScheduledOnReboot} file erano in uso: verranno eliminati al prossimo riavvio"));
-            foreach (var f in result.Failed.Take(3)) checks.Add(CheckLine.Fail("Non eliminato: " + f));
-            if (result.Failed.Count > 3) checks.Add(CheckLine.Fail($"…e altri {result.Failed.Count - 3}"));
+                checks.Add(CheckLine.Warn($"{result.ScheduledOnReboot} files were in use: they'll be deleted at the next restart"));
+            foreach (var f in result.Failed.Take(3)) checks.Add(CheckLine.Fail("Not deleted: " + f));
+            if (result.Failed.Count > 3) checks.Add(CheckLine.Fail($"…and {result.Failed.Count - 3} more"));
             if (!string.IsNullOrEmpty(result.BackupFolder))
-                checks.Add(CheckLine.Info("Copia di sicurezza del registro salvata in " + result.BackupFolder));
+                checks.Add(CheckLine.Info("Registry backup saved in " + result.BackupFolder));
             if (remainingSelected > 0 && result.ScheduledOnReboot == 0)
-                checks.Add(CheckLine.Warn("Verifica: alcuni elementi selezionati sono ancora presenti"));
+                checks.Add(CheckLine.Warn("Check: some selected items are still there"));
             else if (remaining.Count == 0)
-                checks.Add(CheckLine.Ok("Verifica finale: non è rimasta nessuna traccia"));
+                checks.Add(CheckLine.Ok("Final check: no trace left"));
             else
-                checks.Add(CheckLine.Info($"Verifica finale: restano {remaining.Count} elementi che hai scelto di tenere"));
+                checks.Add(CheckLine.Info($"Final check: {remaining.Count} items you chose to keep are still there"));
 
             UpdateDisk();
             _ = LoadAppsAsync();
-            var names = items.Count > 1 ? items.Count + " app" : items[0].Info.Name;
-            ShowResult(result.FreedBytes > 0 ? "Liberati " + SizeFormat.Format(result.FreedBytes) : "Pulizia completata",
-                names + (still.Count > 0 ? " ripulite." : items.Count > 1 ? " rimosse completamente." : " è stato rimosso completamente."),
+            var names = items.Count > 1 ? items.Count + " apps" : items[0].Info.Name;
+            ShowResult(result.FreedBytes > 0 ? "Freed " + SizeFormat.Format(result.FreedBytes) : "Cleanup complete",
+                names + (still.Count > 0 ? " cleaned up." : items.Count > 1 ? " removed completely." : " was removed completely."),
                 checks, success: result.Failed.Count == 0,
-                secondaryText: "Mostra registro attività", secondary: () => OpenPath(Log.FilePath));
+                secondaryText: "Show activity log", secondary: () => OpenPath(Log.FilePath));
         }
 
         // ================================================================== residui globali
@@ -848,14 +848,14 @@ namespace Lindo
             OrphansActionBar.Visibility = Visibility.Collapsed;
             OrphanWarning.Visibility = Visibility.Collapsed;
             OrphansLoading.Visibility = Visibility.Visible;
-            OrphansLoadingText.Text = "Leggo le app installate…";
+            OrphansLoadingText.Text = "Reading installed apps…";
             _orphans.Clear();
             try
             {
                 var all = await ScanAllAsync();
-                OrphansLoadingText.Text = "Raccolgo gli indizi d'uso (PATH, servizi, programmi aperti, collegamenti)…";
+                OrphansLoadingText.Text = "Collecting usage evidence (PATH, services, running programs, shortcuts)…";
                 var evidence = await Task.Run(() => EvidenceService.Collect());
-                OrphansLoadingText.Text = "Confronto le cartelle di tutti i dischi con le app installate…";
+                OrphansLoadingText.Text = "Comparing folders on all drives with installed apps…";
                 var found = await Task.Run(() =>
                 {
                     // Anche le voci nascoste (componenti di SDK, runtime…) proteggono le loro cartelle
@@ -872,7 +872,7 @@ namespace Lindo
                             Kind = LeftoverKind.RegistryKey,
                             Path = a.RegistryKey,
                             Confidence = Confidence.High,
-                            Reason = "Voce fantasma: «" + a.Name + "» non è più installato",
+                            Reason = "Ghost entry: «" + a.Name + "» is no longer installed",
                         });
                     }
                     FillSizes(list);
@@ -894,7 +894,7 @@ namespace Lindo
             {
                 OrphansLoading.Visibility = Visibility.Collapsed;
                 ScanOrphansButton.IsEnabled = true;
-                ScanOrphansText.Text = "Analizza di nuovo";
+                ScanOrphansText.Text = "Scan again";
             }
 
             var any = _orphans.Count > 0;
@@ -909,7 +909,7 @@ namespace Lindo
             var sel = _orphans.Where(o => o.IsSelected).ToList();
             var total = _orphans.Sum(o => o.SizeBytes);
             var selSize = sel.Sum(o => o.SizeBytes);
-            OrphansSelection.Text = $"{sel.Count} di {_orphans.Count} selezionati · {(selSize > 0 ? SizeFormat.Format(selSize) : "0 B")} su {SizeFormat.Format(total)}";
+            OrphansSelection.Text = $"{sel.Count} of {_orphans.Count} selected · {(selSize > 0 ? SizeFormat.Format(selSize) : "0 B")} of {SizeFormat.Format(total)}";
             DeleteOrphansButton.IsEnabled = sel.Count > 0;
             var safe = _orphans.Where(o => o.IsSafe).ToList();
             _syncing = true;
@@ -929,30 +929,30 @@ namespace Lindo
             var selected = _orphans.Where(o => o.IsSelected).Select(o => o.Model).ToList();
             if (selected.Count == 0) return;
             var lines = selected.Take(6).Select(s => CheckLine.Info(s.Path)).ToList();
-            if (selected.Count > 6) lines.Add(CheckLine.Info($"…e altri {selected.Count - 6}"));
-            ShowResult($"Eliminare {selected.Count} {(selected.Count == 1 ? "elemento" : "elementi")}?",
-                "L'operazione non si può annullare (per il registro viene salvata una copia di sicurezza).",
+            if (selected.Count > 6) lines.Add(CheckLine.Info($"…and {selected.Count - 6} more"));
+            ShowResult($"Delete {selected.Count} {(selected.Count == 1 ? "item" : "items")}?",
+                "This can't be undone (a backup of the registry is saved).",
                 lines, success: false, danger: true,
-                primaryText: "Elimina", primary: async () => await DeleteOrphansAsync(selected),
-                secondaryText: "Annulla", secondary: CloseDialog);
+                primaryText: "Delete", primary: async () => await DeleteOrphansAsync(selected),
+                secondaryText: "Cancel", secondary: CloseDialog);
         }
 
         private async Task DeleteOrphansAsync(List<Leftover> selected)
         {
-            DlgRunningTitle.Text = "Pulizia in corso";
-            DlgRunningText.Text = "Elimino gli elementi selezionati…";
+            DlgRunningTitle.Text = "Cleaning up";
+            DlgRunningText.Text = "Deleting the selected items…";
             DlgSkipWait.Visibility = Visibility.Collapsed;
             ShowPanel(DlgRunning);
             var progress = new Progress<string>(t => DlgRunningText.Text = t);
             var result = await Task.Run(() => Cleaner.Delete(selected, progress));
 
-            var checks = new List<CheckLine> { CheckLine.Ok($"{result.Deleted} elementi eliminati") };
-            if (result.ScheduledOnReboot > 0) checks.Add(CheckLine.Warn($"{result.ScheduledOnReboot} file in uso verranno eliminati al riavvio"));
-            foreach (var f in result.Failed.Take(3)) checks.Add(CheckLine.Fail("Non eliminato: " + f));
-            if (!string.IsNullOrEmpty(result.BackupFolder)) checks.Add(CheckLine.Info("Copia di sicurezza del registro in " + result.BackupFolder));
+            var checks = new List<CheckLine> { CheckLine.Ok($"{result.Deleted} items deleted") };
+            if (result.ScheduledOnReboot > 0) checks.Add(CheckLine.Warn($"{result.ScheduledOnReboot} files in use will be deleted at restart"));
+            foreach (var f in result.Failed.Take(3)) checks.Add(CheckLine.Fail("Not deleted: " + f));
+            if (!string.IsNullOrEmpty(result.BackupFolder)) checks.Add(CheckLine.Info("Registry backup in " + result.BackupFolder));
 
             UpdateDisk();
-            ShowResult(result.FreedBytes > 0 ? "Liberati " + SizeFormat.Format(result.FreedBytes) : "Pulizia completata", null,
+            ShowResult(result.FreedBytes > 0 ? "Freed " + SizeFormat.Format(result.FreedBytes) : "Cleanup complete", null,
                 checks, success: result.Failed.Count == 0, primary: async () => { CloseDialog(); await ScanOrphansAsync(); });
             _ = LoadAppsAsync();
         }
@@ -1004,7 +1004,7 @@ namespace Lindo
 
         private async Task MeasureCleanAsync()
         {
-            CleanTotal.Text = "Calcolo…";
+            CleanTotal.Text = "Calculating…";
             CleanButton.IsEnabled = false;
             foreach (var t in _cleanTargets) t.SizeBytes = -1;
             var tasks = _cleanTargets.Select(async t =>
@@ -1020,7 +1020,7 @@ namespace Lindo
         private void UpdateCleanTotal()
         {
             var sel = _cleanTargets.Where(t => t.IsSelected && t.SizeBytes > 0).Sum(t => t.SizeBytes);
-            CleanTotal.Text = _cleanTargets.Any(t => t.SizeBytes < 0) && sel == 0 ? "Calcolo…" : sel > 0 ? SizeFormat.Format(sel) : "0 MB";
+            CleanTotal.Text = _cleanTargets.Any(t => t.SizeBytes < 0) && sel == 0 ? "Calculating…" : sel > 0 ? SizeFormat.Format(sel) : "0 MB";
         }
 
         private void OnCleanSelectionChanged(object sender, RoutedEventArgs e) => UpdateCleanTotal();
@@ -1030,16 +1030,16 @@ namespace Lindo
             var selected = _cleanTargets.Where(t => t.IsSelected).ToList();
             if (selected.Count == 0) return;
             CleanButton.IsEnabled = false;
-            CleanStatus.Text = "Pulizia in corso…";
+            CleanStatus.Text = "Cleaning…";
             long freed = 0;
             foreach (var t in selected)
             {
-                CleanStatus.Text = "Pulizia: " + t.Title + "…";
+                CleanStatus.Text = "Cleaning: " + t.Title + "…";
                 freed += await Task.Run(() => QuickClean.Clean(t.Target));
             }
-            CleanStatus.Text = "Ultima pulizia: liberati " + SizeFormat.Format(freed) + ". Alcuni file in uso vengono saltati.";
+            CleanStatus.Text = "Last cleanup: freed " + SizeFormat.Format(freed) + ". Some files in use are skipped.";
             UpdateDisk();
-            ShowToast(freed > 0 ? "Liberati " + SizeFormat.Format(freed) : "Era già tutto pulito");
+            ShowToast(freed > 0 ? "Freed " + SizeFormat.Format(freed) : "Everything was already clean");
             await MeasureCleanAsync();
         }
 
@@ -1063,47 +1063,47 @@ namespace Lindo
             {
                 Directory.CreateDirectory(ScreenshotFolder);
                 await Task.Delay(2500);
-                Save("1-applicazioni.png");
+                Save("1-apps.png");
 
                 var first = _apps.OrderByDescending(a => a.SizeBytes).FirstOrDefault();
                 if (first != null)
                 {
                     OnUninstallClick(new Button { Tag = first }, null);
                     await Task.Delay(600);
-                    Save("2-conferma.png");
+                    Save("2-confirm.png");
                     CloseDialog();
                 }
 
                 NavLeftovers.IsChecked = true;
                 await ScanOrphansAsync();
                 await Task.Delay(500);
-                Save("3-residui.png");
+                Save("3-leftovers.png");
 
                 NavClean.IsChecked = true;
                 await Task.Delay(300);
                 while (_cleanTargets.Any(t => t.SizeBytes < 0)) await Task.Delay(200);
                 await Task.Delay(400);
-                Save("4-pulizia.png");
+                Save("4-quick-clean.png");
 
                 NavStartup.IsChecked = true;
                 while (!_startupLoaded) await Task.Delay(200);
                 await Task.Delay(600);
-                Save("5-avvio.png");
+                Save("5-startup.png");
 
                 NavOptimize.IsChecked = true;
                 while (!_optimizeLoaded) await Task.Delay(200);
-                await Task.Delay(600);
-                Save("6-ottimizza.png");
+                await Task.Delay(3500); // lettura di CPU, RAM e scheda video
+                Save("6-optimize.png");
 
                 NavCrashes.IsChecked = true;
                 while (!_crashesLoaded) await Task.Delay(200);
                 await Task.Delay(600);
-                Save("7-crash.png");
+                Save("7-crashes.png");
 
                 NavApps.IsChecked = true;
                 FilterDrivers.IsChecked = true;
                 await Task.Delay(800);
-                Save("8-driver.png");
+                Save("8-drivers.png");
             }
             catch (Exception ex)
             {

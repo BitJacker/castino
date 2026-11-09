@@ -6,7 +6,7 @@ namespace Lindo.Core
 {
     public static class SizeFormat
     {
-        private static readonly CultureInfo It = CultureInfo.GetCultureInfo("it-IT");
+        private static readonly CultureInfo It = CultureInfo.GetCultureInfo("en-US");
 
         public static string Format(long bytes)
         {

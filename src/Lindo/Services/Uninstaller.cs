@@ -51,7 +51,7 @@ namespace Lindo.Services
         {
             if (app.Source == AppSource.Store)
             {
-                status?.Report("Rimozione dell'app dallo Store…");
+                status?.Report("Removing the Store app…");
                 await Task.Run(() => PowerShell.Run("Remove-AppxPackage -Package '" + app.PackageFullName.Replace("'", "''") + "'",
                     TimeSpan.FromMinutes(5)));
                 return IsStillInstalled(app) ? UninstallOutcome.StillInstalled : UninstallOutcome.Completed;
@@ -80,7 +80,7 @@ namespace Lindo.Services
             Process main;
             try
             {
-                status?.Report("Avvio del programma di disinstallazione…");
+                status?.Report("Starting the uninstaller…");
                 main = Process.Start(psi);
             }
             catch (Exception ex)
@@ -89,7 +89,7 @@ namespace Lindo.Services
                 return UninstallOutcome.NoUninstaller;
             }
 
-            status?.Report("Segui le istruzioni nella finestra del programma di disinstallazione.");
+            status?.Report("Follow the instructions in the uninstaller window.");
             var uninstallerDir = SafeDir(psi.FileName);
 
             while (!skip.IsCancellationRequested)

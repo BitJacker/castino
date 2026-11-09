@@ -109,33 +109,33 @@ namespace Lindo.Core
         public string WhyBlocked(string path, LeftoverKind kind = LeftoverKind.Folder)
         {
             var p = WinPath.Normalize(path);
-            if (p.Length == 0) return "Percorso vuoto";
-            if (p.StartsWith(@"\\", StringComparison.Ordinal)) return "Percorso di rete";
-            if (p.Length < 3 || p[1] != ':') return "Percorso non assoluto";
-            if (WinPath.Depth(p) <= 1) return "Radice di un disco";
+            if (p.Length == 0) return "Empty path";
+            if (p.StartsWith(@"\\", StringComparison.Ordinal)) return "Network path";
+            if (p.Length < 3 || p[1] != ':') return "Not an absolute path";
+            if (WinPath.Depth(p) <= 1) return "Root of a drive";
 
             if (_protectedExact.Any(x => string.Equals(x, p, StringComparison.OrdinalIgnoreCase)))
-                return "Cartella di sistema";
+                return "System folder";
 
             // Non si può eliminare un antenato di una cartella protetta (es. C:\Users\Nome)
             if (kind == LeftoverKind.Folder &&
                 _protectedExact.Concat(_protectedTrees).Any(x => WinPath.IsSameOrInside(x, p)))
-                return "Contiene cartelle di sistema";
+                return "Contains system folders";
 
             // I collegamenti del menu Start stanno dentro ...\Microsoft\Windows, ma sono eliminabili
             var inStartMenu = WinPath.IsStrictlyInside(p, _roots.UserStartPrograms) || WinPath.IsStrictlyInside(p, _roots.CommonStartPrograms);
             if (inStartMenu)
             {
                 foreach (var startup in new[] { WinPath.Combine(_roots.UserStartPrograms, "Startup"), WinPath.Combine(_roots.CommonStartPrograms, "Startup") })
-                    if (WinPath.IsSameOrInside(p, startup) && kind == LeftoverKind.Folder) return "Cartella Esecuzione automatica";
+                    if (WinPath.IsSameOrInside(p, startup) && kind == LeftoverKind.Folder) return "Startup folder";
                 return null;
             }
 
             if (_protectedTrees.Any(x => WinPath.IsSameOrInside(p, x)))
-                return "Area protetta di Windows";
+                return "Protected Windows area";
 
             if (!_allowedTrees.Any(x => WinPath.IsStrictlyInside(p, x)))
-                return "Fuori dalle cartelle dei programmi";
+                return "Outside the program folders";
 
             // Primo livello sotto una radice dati: blocca i nomi di sistema
             foreach (var root in _allowedTrees)
@@ -143,7 +143,7 @@ namespace Lindo.Core
                 if (WinPath.IsStrictlyInside(p, root) && WinPath.Depth(p) == WinPath.Depth(root) + 1)
                 {
                     if (SystemFolderNames.Contains(WinPath.GetFileName(p)))
-                        return "Cartella condivisa di sistema";
+                        return "Shared system folder";
                 }
             }
 

@@ -4,10 +4,10 @@
   Si compila con wixl (msitools) su Linux:   wixl -a x64 -D Version=1.0.0 -D BinDir=... -o Lindo.msi installer/Lindo.wxs
 -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="Lindo" Language="1040" Codepage="1252" Version="$(var.Version)"
+  <Product Id="*" Name="Lindo" Language="1033" Codepage="1252" Version="$(var.Version)"
            Manufacturer="Lindo" UpgradeCode="6B1D7C3E-2F4A-4C8E-9A51-3D7E0B2F9C41">
     <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine"
-             Description="Lindo - disinstalla le app senza lasciare residui" Comments="Lindo" Manufacturer="Lindo" />
+             Description="Lindo - uninstall apps without leftovers" Comments="Lindo" Manufacturer="Lindo" />
 
     <MajorUpgrade DowngradeErrorMessage="È già installata una versione più recente di Lindo." />
     <Media Id="1" Cabinet="lindo.cab" EmbedCab="yes" />
@@ -29,14 +29,14 @@
       </Directory>
       <Directory Id="ProgramMenuFolder">
         <Component Id="StartShortcut" Guid="9C2E4B17-6D3A-4F85-B1E2-7A0C5D9E3F28" Win64="yes">
-          <Shortcut Id="LindoStart" Name="Lindo" Description="Disinstalla le app senza lasciare residui"
+          <Shortcut Id="LindoStart" Name="Lindo" Description="Uninstall apps without leftovers"
                     Target="[INSTALLDIR]Lindo.exe" WorkingDirectory="INSTALLDIR" Icon="LindoIcon" />
           <RegistryValue Root="HKCU" Key="Software\Lindo" Name="StartShortcut" Type="integer" Value="1" KeyPath="yes" />
         </Component>
       </Directory>
       <Directory Id="DesktopFolder">
         <Component Id="DesktopShortcut" Guid="E4A7C2B9-1F6D-4B3E-8C5A-2D9F7E1B6A34" Win64="yes">
-          <Shortcut Id="LindoDesktop" Name="Lindo" Description="Disinstalla le app senza lasciare residui"
+          <Shortcut Id="LindoDesktop" Name="Lindo" Description="Uninstall apps without leftovers"
                     Target="[INSTALLDIR]Lindo.exe" WorkingDirectory="INSTALLDIR" Icon="LindoIcon" />
           <RegistryValue Root="HKCU" Key="Software\Lindo" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
         </Component>

@@ -59,8 +59,8 @@ namespace Lindo
             Log.Write("Errore interfaccia: " + e.Exception);
             e.Handled = true;
             if (_headless) return; // nei test automatici nessuna finestra deve bloccare
-            MessageBox.Show("Si è verificato un errore imprevisto:\n\n" + e.Exception.Message +
-                            "\n\nDettagli nel file:\n" + Log.FilePath, "Lindo", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("An unexpected error occurred:\n\n" + e.Exception.Message +
+                            "\n\nDetails in the file:\n" + Log.FilePath, "Lindo", MessageBoxButton.OK, MessageBoxImage.Warning);
             e.Handled = true;
         }
     }

@@ -95,7 +95,7 @@ namespace Lindo.Core
             if (!string.IsNullOrWhiteSpace(app.InstallLocation) && _fs.DirectoryExists(app.InstallLocation))
             {
                 if (!IsSharedWithOthers(app.InstallLocation, others))
-                    Add(LeftoverKind.Folder, app.InstallLocation, Confidence.High, "Cartella di installazione");
+                    Add(LeftoverKind.Folder, app.InstallLocation, Confidence.High, "Install folder");
             }
 
             // 2) Cartella del disinstallatore / dell'icona, se ha il nome del programma
@@ -107,7 +107,7 @@ namespace Lindo.Core
                 if (dir.Length == 0 || !_fs.DirectoryExists(dir)) continue;
                 var s = NameMatcher.Match(WinPath.GetFileName(dir), app.Name, installFolder, app.Publisher);
                 if (s >= MatchStrength.Medium && !IsSharedWithOthers(dir, others))
-                    Add(LeftoverKind.Folder, dir, Confidence.High, "Cartella del programma");
+                    Add(LeftoverKind.Folder, dir, Confidence.High, "Program folder");
             }
 
             // 3) Cartelle dati nelle radici note (+ un livello sotto la cartella dell'editore)
@@ -124,14 +124,14 @@ namespace Lindo.Core
                         {
                             var s2 = MatchInsidePublisher(WinPath.GetFileName(sub), app);
                             if (s2 > MatchStrength.None && !OwnedByOther(sub, s2, others))
-                                Add(LeftoverKind.Folder, sub, ToConfidence(s2), "Dati del programma (" + name + ")");
+                                Add(LeftoverKind.Folder, sub, ToConfidence(s2), "Program data (" + name + ")");
                         }
                         continue;
                     }
 
                     var s = NameMatcher.Match(name, app.Name, installFolder, app.Publisher);
                     if (s > MatchStrength.None && !OwnedByOther(dir, s, others))
-                        Add(LeftoverKind.Folder, dir, ToConfidence(s), "Dati del programma");
+                        Add(LeftoverKind.Folder, dir, ToConfidence(s), "Program data");
                 }
             }
 
@@ -156,7 +156,7 @@ namespace Lindo.Core
                                        name.Equals("Maintenance", StringComparison.OrdinalIgnoreCase);
                     var s = IsPublisherFolder(name, app) || systemFolder ? MatchStrength.None : NameMatcher.Match(name, app.Name, installFolder, app.Publisher);
                     if (s >= MatchStrength.Medium && !OwnedByOther(dir, s, others))
-                        Add(LeftoverKind.Shortcut, dir, ToConfidence(s), "Cartella nel menu Start");
+                        Add(LeftoverKind.Shortcut, dir, ToConfidence(s), "Start menu folder");
                     else
                         ScanShortcuts(dir, app, others, installDirs, Add);
                 }
@@ -169,7 +169,7 @@ namespace Lindo.Core
             if (_reg != null)
             {
                 if (!string.IsNullOrWhiteSpace(app.RegistryKey) && _reg.KeyExists(app.RegistryKey))
-                    Add(LeftoverKind.RegistryKey, app.RegistryKey, Confidence.High, "Voce di disinstallazione rimasta");
+                    Add(LeftoverKind.RegistryKey, app.RegistryKey, Confidence.High, "Leftover uninstall entry");
 
                 foreach (var baseKey in new[] { @"HKCU\Software", @"HKLM\SOFTWARE", @"HKLM\SOFTWARE\WOW6432Node" })
                 {
@@ -184,14 +184,14 @@ namespace Lindo.Core
                             {
                                 var s2 = MatchInsidePublisher(sub2, app);
                                 if (s2 >= MatchStrength.Medium && !OwnedByOtherName(sub2, s2, others))
-                                    Add(LeftoverKind.RegistryKey, full + "\\" + sub2, ToConfidence(s2), "Impostazioni nel registro");
+                                    Add(LeftoverKind.RegistryKey, full + "\\" + sub2, ToConfidence(s2), "Registry settings");
                             }
                             continue;
                         }
                         if (ProtectedRegistryNames.Contains(sub)) continue;
                         var s = NameMatcher.Match(sub, app.Name, installFolder, app.Publisher);
                         if (s >= MatchStrength.Medium && !OwnedByOtherName(sub, s, others))
-                            Add(LeftoverKind.RegistryKey, full, ToConfidence(s), "Impostazioni nel registro");
+                            Add(LeftoverKind.RegistryKey, full, ToConfidence(s), "Registry settings");
                     }
                 }
             }
@@ -228,11 +228,11 @@ namespace Lindo.Core
                     if (!string.IsNullOrWhiteSpace(target))
                     {
                         if (installDirs.Any(d => WinPath.IsSameOrInside(target, d)))
-                            add(LeftoverKind.Shortcut, file, Confidence.High, "Collegamento al programma");
+                            add(LeftoverKind.Shortcut, file, Confidence.High, "Shortcut to the program");
                         else if (!windowsName && !_fs.FileExists(target) && !_fs.DirectoryExists(target) &&
                                  NameMatcher.Match(name, app.Name, app.InstallFolderName, app.Publisher) == MatchStrength.Strong &&
                                  !OwnedByOtherName(name, MatchStrength.Strong, others))
-                            add(LeftoverKind.Shortcut, file, Confidence.Medium, "Collegamento rotto al programma");
+                            add(LeftoverKind.Shortcut, file, Confidence.Medium, "Broken shortcut to the program");
                         // Punta a qualcos'altro che esiste: appartiene a un altro programma, non si tocca
                         continue;
                     }
@@ -329,7 +329,7 @@ namespace Lindo.Core
                         Kind = LeftoverKind.Folder,
                         Path = WinPath.Normalize(dir),
                         Confidence = Confidence.Low,
-                        Reason = "Nessun programma installato usa questa cartella",
+                        Reason = "No installed program uses this folder",
                     };
 
                     if (evidence != null)
@@ -343,14 +343,14 @@ namespace Lindo.Core
                         if (newest.HasValue && evidence.Now - newest.Value < TimeSpan.FromDays(evidence.RecentDays))
                         {
                             item.Confidence = Confidence.Low;
-                            item.Reason = "Usata di recente (" + TimeText.Ago(newest.Value, evidence.Now) + "): forse serve ancora";
+                            item.Reason = "Used recently (" + TimeText.Ago(newest.Value, evidence.Now) + "): it may still be needed";
                         }
                         else
                         {
                             item.Confidence = Confidence.High;
                             item.Reason = newest.HasValue
-                                ? "Nessun programma la usa, ferma da " + TimeText.Ago(newest.Value, evidence.Now).Replace(" fa", "")
-                                : "Nessun programma la usa";
+                                ? "No program uses it, untouched for " + TimeText.Ago(newest.Value, evidence.Now).Replace(" ago", "")
+                                : "No program uses it";
                         }
                     }
                     result.Add(item);

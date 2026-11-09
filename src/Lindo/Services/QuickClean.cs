@@ -33,31 +33,31 @@ namespace Lindo.Services
             {
                 new CleanTarget
                 {
-                    Title = "File temporanei",
-                    Description = "File lasciati dalle app nella cartella Temp del tuo utente.",
+                    Title = "Temporary files",
+                    Description = "Files left by apps in your user's Temp folder.",
                     Glyph = "\uE7B8",
                     Folders = { Path.GetTempPath() },
                     MinAge = TimeSpan.FromHours(24),
                 },
                 new CleanTarget
                 {
-                    Title = "Temporanei di Windows",
-                    Description = "Cartella Temp di sistema (C:\\Windows\\Temp).",
+                    Title = "Windows temporary files",
+                    Description = "System Temp folder (C:\\Windows\\Temp).",
                     Glyph = "\uE770",
                     Folders = { Path.Combine(win, "Temp") },
                     MinAge = TimeSpan.FromHours(24),
                 },
                 new CleanTarget
                 {
-                    Title = "Cestino",
-                    Description = "I file nel Cestino occupano ancora spazio sul disco.",
+                    Title = "Recycle Bin",
+                    Description = "Files in the Recycle Bin still take up disk space.",
                     Glyph = "\uE74D",
                     IsRecycleBin = true,
                 },
                 new CleanTarget
                 {
-                    Title = "Cache delle miniature",
-                    Description = "Anteprime delle immagini: Windows le ricrea quando servono.",
+                    Title = "Thumbnail cache",
+                    Description = "Image previews: Windows recreates them when needed.",
                     Glyph = "\uE91B",
                     Folders = { Path.Combine(local, @"Microsoft\Windows\Explorer") },
                     FileFilter = f => Path.GetFileName(f).StartsWith("thumbcache_", StringComparison.OrdinalIgnoreCase) ||
@@ -66,8 +66,8 @@ namespace Lindo.Services
                 },
                 new CleanTarget
                 {
-                    Title = "Rapporti errori e crash",
-                    Description = "Segnalazioni errori di Windows e file di dump dei crash.",
+                    Title = "Error and crash reports",
+                    Description = "Windows Error Reporting files and crash dumps.",
                     Glyph = "\uE9D9",
                     Folders =
                     {
@@ -81,8 +81,8 @@ namespace Lindo.Services
                 },
                 new CleanTarget
                 {
-                    Title = "File di Windows Update già installati",
-                    Description = "Pacchetti scaricati da Windows Update (vengono riscaricati se servono).",
+                    Title = "Already-installed Windows Update files",
+                    Description = "Packages downloaded by Windows Update (downloaded again if needed).",
                     Glyph = "\uE895",
                     Folders = { Path.Combine(win, @"SoftwareDistribution\Download") },
                     MinAge = TimeSpan.FromDays(3),

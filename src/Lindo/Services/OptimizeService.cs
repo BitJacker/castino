@@ -186,9 +186,9 @@ namespace Lindo.Services
             {
                 new OptimizeAction
                 {
-                    Id = "power", Category = "Prestazioni", Glyph = "",
-                    Title = "Piano energetico \"Prestazioni elevate\"",
-                    Description = "Il processore non rallenta per risparmiare energia. Sui portatili la batteria dura un po' meno.",
+                    Id = "power", Category = "Performance", Glyph = "",
+                    Title = "\"High performance\" power plan",
+                    Description = "The processor doesn't slow down to save power. On laptops the battery lasts a little less.",
                     IsApplied = () => { var a = ActiveScheme(); return a == HighPerformance || a == UltimatePerformance; },
                     Apply = () =>
                     {
@@ -196,21 +196,21 @@ namespace Lindo.Services
                         if (current == HighPerformance || current == UltimatePerformance) return null;
                         Remember("power", current);
                         return RunCapture(Path.Combine(Environment.SystemDirectory, "powercfg.exe"), "/setactive " + HighPerformance) != null
-                            ? null : "Il piano \"Prestazioni elevate\" non è disponibile su questo PC";
+                            ? null : "The \"High performance\" plan isn't available on this PC";
                     },
                     Restore = () =>
                     {
                         var b = Recall("power");
                         if (b == null || b == "<null>") return null;
                         Forget("power");
-                        return RunCapture(Path.Combine(Environment.SystemDirectory, "powercfg.exe"), "/setactive " + b) != null ? null : "Impossibile ripristinare il piano energetico";
+                        return RunCapture(Path.Combine(Environment.SystemDirectory, "powercfg.exe"), "/setactive " + b) != null ? null : "Couldn't restore the power plan";
                     },
                 },
                 new OptimizeAction
                 {
                     Id = "gamedvr", Category = "Gaming", Glyph = "",
-                    Title = "Niente registrazione in background di Xbox Game Bar",
-                    Description = "Game Bar non registra più di nascosto mentre giochi: spesso fa guadagnare FPS. Puoi sempre registrare a mano.",
+                    Title = "No Xbox Game Bar background recording",
+                    Description = "Game Bar stops recording in the background while you play: often gains FPS. You can still record manually.",
                     IsApplied = () => GetDword(GameDvrKey, "AppCaptureEnabled") == 0 && GetDword(GameStoreKey, "GameDVR_Enabled") == 0,
                     Apply = () => ApplyDwords("gamedvr", (GameDvrKey, "AppCaptureEnabled", 0), (GameStoreKey, "GameDVR_Enabled", 0)),
                     Restore = () => RestoreDwords("gamedvr", (GameDvrKey, "AppCaptureEnabled"), (GameStoreKey, "GameDVR_Enabled")),
@@ -218,8 +218,8 @@ namespace Lindo.Services
                 new OptimizeAction
                 {
                     Id = "gamemode", Category = "Gaming", Glyph = "",
-                    Title = "Modalità gioco attiva",
-                    Description = "Windows dà priorità al gioco aperto e rimanda aggiornamenti e notifiche.",
+                    Title = "Game Mode on",
+                    Description = "Windows prioritizes the open game and postpones updates and notifications.",
                     IsApplied = () => GetDword(GameBarKey, "AutoGameModeEnabled") != 0,
                     Apply = () => ApplyDwords("gamemode", (GameBarKey, "AutoGameModeEnabled", 1)),
                     Restore = () => RestoreDwords("gamemode", (GameBarKey, "AutoGameModeEnabled")),
@@ -227,16 +227,16 @@ namespace Lindo.Services
                 new OptimizeAction
                 {
                     Id = "mouse", Category = "Gaming", Glyph = "",
-                    Title = "Accelerazione del mouse disattivata",
-                    Description = "Toglie \"Precisione puntatore avanzata\": il mirino si muove sempre della stessa quantità, utile negli sparatutto.",
+                    Title = "Mouse acceleration off",
+                    Description = "Turns off \"Enhance pointer precision\": your aim always moves by the same amount, useful in shooters.",
                     IsApplied = () => { var m = GetMouse(); return m != null && m[2] == 0; },
                     Apply = () =>
                     {
                         var m = GetMouse();
-                        if (m == null) return "Impossibile leggere le impostazioni del mouse";
+                        if (m == null) return "Couldn't read the mouse settings";
                         if (m[2] == 0) return null;
                         Remember("mouse", string.Join(",", m));
-                        return SystemParametersInfo(SPI_SETMOUSE, 0, new[] { 0, 0, 0 }, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE) ? null : "Impostazione del mouse non applicata";
+                        return SystemParametersInfo(SPI_SETMOUSE, 0, new[] { 0, 0, 0 }, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE) ? null : "Mouse setting not applied";
                     },
                     Restore = () =>
                     {
@@ -244,14 +244,14 @@ namespace Lindo.Services
                         if (b == null) return null;
                         var v = b.Split(',').Select(int.Parse).ToArray();
                         Forget("mouse");
-                        return SystemParametersInfo(SPI_SETMOUSE, 0, v, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE) ? null : "Impossibile ripristinare il mouse";
+                        return SystemParametersInfo(SPI_SETMOUSE, 0, v, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE) ? null : "Couldn't restore the mouse";
                     },
                 },
                 new OptimizeAction
                 {
                     Id = "sticky", Category = "Gaming", Glyph = "",
-                    Title = "Niente popup \"Tasti permanenti\" premendo Maiusc 5 volte",
-                    Description = "Evita che il gioco venga interrotto dal messaggio dei Tasti permanenti.",
+                    Title = "No \"Sticky Keys\" popup when pressing Shift 5 times",
+                    Description = "Stops the Sticky Keys message from interrupting your game.",
                     IsApplied = () => (GetSticky().dwFlags & SKF_HOTKEYACTIVE) == 0,
                     Apply = () =>
                     {
@@ -259,7 +259,7 @@ namespace Lindo.Services
                         if ((s.dwFlags & SKF_HOTKEYACTIVE) == 0) return null;
                         Remember("sticky", s.dwFlags.ToString());
                         s.dwFlags &= ~SKF_HOTKEYACTIVE;
-                        return SystemParametersInfo(SPI_SETSTICKYKEYS, s.cbSize, ref s, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE) ? null : "Impostazione non applicata";
+                        return SystemParametersInfo(SPI_SETSTICKYKEYS, s.cbSize, ref s, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE) ? null : "Setting not applied";
                     },
                     Restore = () =>
                     {
@@ -268,23 +268,23 @@ namespace Lindo.Services
                         var s = GetSticky();
                         s.dwFlags = uint.Parse(b);
                         Forget("sticky");
-                        return SystemParametersInfo(SPI_SETSTICKYKEYS, s.cbSize, ref s, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE) ? null : "Impossibile ripristinare";
+                        return SystemParametersInfo(SPI_SETSTICKYKEYS, s.cbSize, ref s, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE) ? null : "Couldn't restore";
                     },
                 },
                 new OptimizeAction
                 {
-                    Id = "visual", Category = "Prestazioni", Glyph = "",
-                    Title = "Effetti visivi leggeri",
-                    Description = "Toglie animazioni, ombre e trasparenze di Windows: molto utile sui PC poco potenti. Vale dal prossimo accesso.",
+                    Id = "visual", Category = "Performance", Glyph = "",
+                    Title = "Lighter visual effects",
+                    Description = "Removes Windows animations, shadows and transparency: very useful on low-end PCs. Applies from the next sign-in.",
                     IsApplied = () => GetDword(VfxKey, "VisualFXSetting") == 2 && GetDword(PersonalizeKey, "EnableTransparency") == 0,
                     Apply = () => ApplyDwords("visual", (VfxKey, "VisualFXSetting", 2), (PersonalizeKey, "EnableTransparency", 0)),
                     Restore = () => RestoreDwords("visual", (VfxKey, "VisualFXSetting"), (PersonalizeKey, "EnableTransparency")),
                 },
                 new OptimizeAction
                 {
-                    Id = "startup", Category = "Avvio", Glyph = "",
-                    Title = "Togli le app inutili dall'avvio",
-                    Description = "Disattiva all'avvio launcher, aggiornatori e app di chat/giochi (es. Steam, Discord, FortiClient). Antivirus, driver, audio e touchpad restano.",
+                    Id = "startup", Category = "Startup", Glyph = "",
+                    Title = "Remove unneeded apps from startup",
+                    Description = "Stops launchers, updaters and chat/game apps from starting with Windows (e.g. Steam, Discord, FortiClient). Antivirus, drivers, audio and touchpad stay.",
                     IsApplied = () => !startupProvider().Any(e => e.Enabled && e.Suggested),
                     Apply = () =>
                     {
@@ -310,9 +310,9 @@ namespace Lindo.Services
                 },
                 new OptimizeAction
                 {
-                    Id = "clean", Category = "Pulizia", Glyph = "", Reversible = false,
-                    Title = "Pulisci file temporanei e cache",
-                    Description = "Temporanei dell'utente e di Windows, cache delle miniature e rapporti di errore (come in Pulizia rapida).",
+                    Id = "clean", Category = "Cleanup", Glyph = "", Reversible = false,
+                    Title = "Clean temporary files and caches",
+                    Description = "User and Windows temporary files, thumbnail cache and error reports (same as Quick clean).",
                     IsApplied = () => false,
                     Apply = () =>
                     {
