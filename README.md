@@ -76,8 +76,12 @@ Ogni eliminazione passa da più controlli, scritti in modo prudente e coperti da
 
 ## Installazione
 
-Scarica dalla pagina [Releases](../../releases) (oppure dagli artifact dell'ultima esecuzione della
-[CI](../../actions)) uno dei due file:
+### ⬇️ Download
+
+- **[Lindo-1.0.0.msi](../../raw/HEAD/download/Lindo-1.0.0.msi)**: installer
+- **[Lindo.exe](../../raw/HEAD/download/Lindo.exe)**: versione portatile
+
+Gli stessi file sono anche nella pagina [Releases](../../releases/latest).
 
 | File | Quando usarlo |
 |---|---|
