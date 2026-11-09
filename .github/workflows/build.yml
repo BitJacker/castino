@@ -177,8 +177,13 @@ jobs:
           git add docs/screenshots/*.png docs/test-robot
           if git diff --cached --quiet; then echo "Nessuna schermata nuova"; exit 0; fi
           git commit -m "Aggiorna le schermate del README [skip ci]"
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          # Se nel frattempo è arrivato un altro commit, le schermate di questo giro hanno la precedenza
+          for i in 1 2 3; do
+            git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            git rebase --abort 2>/dev/null || true
+            sleep 5
+          done
+          exit 1
 
   release:
     name: Pubblica la release

@@ -111,6 +111,22 @@ namespace Lindo.Services
             return IsStillInstalled(app) ? UninstallOutcome.StillInstalled : UninstallOutcome.Completed;
         }
 
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+        private static extern int GetLongPathName(string shortPath, System.Text.StringBuilder longPath, int size);
+
+        /// <summary>Converte un percorso con nomi brevi 8.3 (RUNNER~1) nella forma lunga.</summary>
+        internal static string LongPath(string path)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(path) || path.IndexOf('~') < 0) return path;
+                var sb = new System.Text.StringBuilder(1024);
+                var n = GetLongPathName(path, sb, sb.Capacity);
+                return n > 0 && n < sb.Capacity ? sb.ToString() : path;
+            }
+            catch { return path; }
+        }
+
         private static string SafeDir(string file)
         {
             try { return Path.GetDirectoryName(file) ?? string.Empty; } catch { return string.Empty; }
@@ -124,7 +140,16 @@ namespace Lindo.Services
         /// <summary>Processi nuovi che sembrano far parte della disinstallazione (copie in %TEMP%, Au_.exe di NSIS, ecc.).</summary>
         private static List<Process> FindHelperProcesses(HashSet<int> before, DateTime started, string uninstallerDir)
         {
-            var temp = Path.GetTempPath();
+            // Cartelle temporanee in forma lunga: GetTempPath può restituire nomi brevi 8.3
+            // (es. C:\Users\RUNNER~1\...) mentre il percorso del processo è in forma lunga.
+            var temps = new[]
+            {
+                Path.GetTempPath(),
+                Environment.GetEnvironmentVariable("TEMP", EnvironmentVariableTarget.User) ?? "",
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Temp"),
+            }.Where(t => t.Length > 3).Select(t => LongPath(Environment.ExpandEnvironmentVariables(t))).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            uninstallerDir = uninstallerDir.Length > 0 ? LongPath(uninstallerDir) : uninstallerDir;
             var result = new List<Process>();
             foreach (var p in Process.GetProcesses())
             {
@@ -133,12 +158,14 @@ namespace Lindo.Services
                     if (before.Contains(p.Id)) continue;
                     if (p.StartTime < started.AddSeconds(-2)) continue;
                     var name = p.ProcessName.ToLowerInvariant();
-                    var looksLikeUninstaller = name.StartsWith("au_") || name.StartsWith("un_") || name.Contains("unins") ||
+                    // NSIS si copia in %TEMP%\~nsuA.tmp\ come Un.exe / Un_A.exe / Au_.exe e continua da lì
+                    var looksLikeUninstaller = name == "un" || name == "au_" || name.StartsWith("au_") || name.StartsWith("un_") || name.Contains("unins") ||
                                                name.Contains("uninst") || name.StartsWith("_iu") || name == "msiexec" ||
                                                name.Contains("setup") || name.Contains("update");
                     string path = null;
                     try { path = p.MainModule?.FileName; } catch { }
-                    var inTemp = path != null && WinPath.IsSameOrInside(path, temp);
+                    if (path != null) path = LongPath(path);
+                    var inTemp = path != null && temps.Any(t => WinPath.IsSameOrInside(path, t));
                     var inDir = path != null && uninstallerDir.Length > 0 && WinPath.IsSameOrInside(path, uninstallerDir);
                     if ((looksLikeUninstaller || inTemp || inDir) && name != "lindo" && name != "conhost")
                         result.Add(p);

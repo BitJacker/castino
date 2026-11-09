@@ -691,7 +691,9 @@ namespace Lindo
                 var anyInUse = drivers.Any(d => d.Model.Confidence == Confidence.Low);
                 DlgDriverText.Text = $"Ho trovato {drivers.Count} driver collegati a {names} (per esempio {drivers[0].Model.DisplayName}). Vuoi eliminare anche i driver?" +
                                      (anyInUse ? " Attenzione: alcuni sono usati da un dispositivo collegato, che smetterà di funzionare finché non reinstalli il driver." : "");
+                _syncing = true;
                 DlgDriverCheck.IsChecked = false;
+                _syncing = false;
             }
 
             var total = found.Sum(f => f.SizeBytes);
@@ -702,8 +704,17 @@ namespace Lindo
             ShowPanel(DlgLeftovers);
         }
 
+        /// <summary>
+        /// Vero mentre Lindo aggiorna da solo le caselle "seleziona tutto": in quel momento i loro eventi
+        /// Checked/Unchecked non devono cambiare la selezione degli elementi.
+        /// (Si usano Checked/Unchecked e non Click perché funzionino anche da tastiera e con le
+        /// tecnologie assistive, che cambiano lo stato senza generare un clic.)
+        /// </summary>
+        private bool _syncing;
+
         private void OnDlgDriverCheck(object sender, RoutedEventArgs e)
         {
+            if (_syncing) return;
             var on = DlgDriverCheck.IsChecked == true;
             foreach (var d in _dlgLeftovers.Where(l => l.IsDriver)) d.IsSelected = on;
         }
@@ -715,13 +726,19 @@ namespace Lindo
             DlgDeleteText.Text = sel.Count == 0 ? "Elimina selezionati"
                 : $"Elimina {sel.Count} " + (sel.Count == 1 ? "elemento" : "elementi") +
                   (sel.Sum(l => l.SizeBytes) > 0 ? " · " + SizeFormat.Format(sel.Sum(l => l.SizeBytes)) : "");
-            DlgSelectAll.IsChecked = sel.Count == _dlgLeftovers.Count && sel.Count > 0;
-            var drivers = _dlgLeftovers.Where(l => l.IsDriver).ToList();
-            if (drivers.Count > 0) DlgDriverCheck.IsChecked = drivers.All(d => d.IsSelected);
+            _syncing = true;
+            try
+            {
+                DlgSelectAll.IsChecked = sel.Count == _dlgLeftovers.Count && sel.Count > 0;
+                var drivers = _dlgLeftovers.Where(l => l.IsDriver).ToList();
+                if (drivers.Count > 0) DlgDriverCheck.IsChecked = drivers.All(d => d.IsSelected);
+            }
+            finally { _syncing = false; }
         }
 
         private void OnDlgSelectAll(object sender, RoutedEventArgs e)
         {
+            if (_syncing) return;
             var on = DlgSelectAll.IsChecked == true;
             foreach (var l in _dlgLeftovers) l.IsSelected = on;
         }
@@ -859,11 +876,14 @@ namespace Lindo
             OrphansSelection.Text = $"{sel.Count} di {_orphans.Count} selezionati · {(selSize > 0 ? SizeFormat.Format(selSize) : "0 B")} su {SizeFormat.Format(total)}";
             DeleteOrphansButton.IsEnabled = sel.Count > 0;
             var safe = _orphans.Where(o => o.IsSafe).ToList();
+            _syncing = true;
             OrphansSelectAll.IsChecked = safe.Count > 0 && safe.All(o => o.IsSelected);
+            _syncing = false;
         }
 
         private void OnOrphansSelectAll(object sender, RoutedEventArgs e)
         {
+            if (_syncing) return;
             var on = OrphansSelectAll.IsChecked == true;
             foreach (var o in _orphans) o.IsSelected = on && o.IsSafe;
         }

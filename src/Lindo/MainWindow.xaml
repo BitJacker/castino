@@ -30,7 +30,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center" Click="OnAppCheckClick"
+                    <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center" Checked="OnAppCheckClick" Unchecked="OnAppCheckClick"
                               AutomationProperties.Name="{Binding Name, StringFormat='Seleziona {0}'}"
                               IsEnabled="{Binding CanUninstall}" ToolTip="Seleziona per disinstallare più app insieme"/>
 
@@ -471,7 +471,7 @@
                         Padding="18,12" Margin="0,4,0,22" Visibility="Collapsed">
                     <Grid>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <CheckBox x:Name="OrphansSelectAll" Content="Seleziona tutti i sicuri" Click="OnOrphansSelectAll" Foreground="{StaticResource Subtle}"/>
+                            <CheckBox x:Name="OrphansSelectAll" Content="Seleziona tutti i sicuri" Checked="OnOrphansSelectAll" Unchecked="OnOrphansSelectAll" Foreground="{StaticResource Subtle}"/>
                             <TextBlock x:Name="OrphansSelection" Text="" Foreground="{StaticResource Subtle}" Margin="24,0,0,0" VerticalAlignment="Center"/>
                         </StackPanel>
                         <Button x:Name="DeleteOrphansButton" AutomationProperties.Name="Elimina residui selezionati" HorizontalAlignment="Right" Style="{StaticResource DangerButton}" Click="OnDeleteOrphansClick">
@@ -544,7 +544,7 @@
                                             <TextBlock Text="{Binding Description}" Style="{StaticResource SubtleText}" FontSize="12.5" Margin="0,3,0,0"/>
                                             <TextBlock Text="{Binding SizeText}" FontWeight="SemiBold" Margin="0,8,0,0" Foreground="#C9BEFF"/>
                                         </StackPanel>
-                                        <CheckBox Grid.Column="2" IsChecked="{Binding IsSelected, Mode=TwoWay}" VerticalAlignment="Top" Click="OnCleanSelectionChanged"/>
+                                        <CheckBox Grid.Column="2" IsChecked="{Binding IsSelected, Mode=TwoWay}" VerticalAlignment="Top" Checked="OnCleanSelectionChanged" Unchecked="OnCleanSelectionChanged"/>
                                     </Grid>
                                 </Border>
                                 <DataTemplate.Triggers>
@@ -1029,14 +1029,14 @@
                                     <TextBlock DockPanel.Dock="Left" Text="&#xE772;" Style="{StaticResource Glyph}" Foreground="#67E8F9" Margin="0,0,12,0"/>
                                     <StackPanel>
                                         <TextBlock x:Name="DlgDriverText" TextWrapping="Wrap" FontSize="13"/>
-                                        <CheckBox x:Name="DlgDriverCheck" Content="Sì, elimina anche i driver" Margin="0,8,0,0" Click="OnDlgDriverCheck"/>
+                                        <CheckBox x:Name="DlgDriverCheck" Content="Sì, elimina anche i driver" Margin="0,8,0,0" Checked="OnDlgDriverCheck" Unchecked="OnDlgDriverCheck"/>
                                     </StackPanel>
                                 </DockPanel>
                             </Border>
                         </StackPanel>
                         <ListBox x:Name="DlgLeftoversList" Grid.Row="1" Style="{StaticResource PlainList}" ItemTemplate="{StaticResource LeftoverRow}" MaxHeight="380" Margin="0,0,-8,0" Padding="0,0,8,0"/>
                         <Grid Grid.Row="2" Margin="0,18,0,0">
-                            <CheckBox x:Name="DlgSelectAll" Content="Seleziona tutto" Foreground="{StaticResource Subtle}" Click="OnDlgSelectAll" VerticalAlignment="Center"/>
+                            <CheckBox x:Name="DlgSelectAll" Content="Seleziona tutto" Foreground="{StaticResource Subtle}" Checked="OnDlgSelectAll" Unchecked="OnDlgSelectAll" VerticalAlignment="Center"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button Style="{StaticResource GhostButton}" Content="Salta" Click="OnSkipLeftovers" Margin="0,0,10,0"/>
                                 <Button x:Name="DlgDeleteButton" AutomationProperties.Name="Elimina selezionati" Style="{StaticResource DangerButton}" Click="OnDeleteLeftovers" Padding="22,10">

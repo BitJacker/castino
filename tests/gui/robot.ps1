@@ -51,6 +51,54 @@ function Wait-For([scriptblock]$cond, [int]$seconds = 60, [string]$what = '') {
     return $null
 }
 function Visible($el) { $el -ne $null -and -not $el.Current.IsOffscreen }
+Add-Type @'
+using System;
+using System.Runtime.InteropServices;
+public static class RealMouse {
+    [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
+    [DllImport("user32.dll")] public static extern void mouse_event(uint f, uint x, uint y, uint d, IntPtr e);
+    [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
+    [DllImport("user32.dll")] public static extern void keybd_event(byte k, byte s, uint f, IntPtr e);
+    // Premere e rilasciare ALT sblocca il cambio di finestra in primo piano da un altro processo
+    public static void Front(IntPtr h) { keybd_event(0x12, 0, 0, IntPtr.Zero); keybd_event(0x12, 0, 2, IntPtr.Zero); SetForegroundWindow(h); }
+    public static void Click(int x, int y) {
+        SetCursorPos(x, y); System.Threading.Thread.Sleep(80);
+        mouse_event(0x0002, 0, 0, 0, IntPtr.Zero); System.Threading.Thread.Sleep(60);
+        mouse_event(0x0004, 0, 0, 0, IntPtr.Zero);
+    }
+}
+'@
+
+# Clic vero col mouse, come una persona: porta Lindo davanti, scorre fino all'elemento e ci clicca sopra
+function Click($el) {
+    if ($el -eq $null) { throw "Elemento non trovato" }
+    if (-not $el.Current.IsEnabled) { throw "Elemento disattivato: $($el.Current.Name)" }
+    $p = $null
+    if ($el.TryGetCurrentPattern([System.Windows.Automation.ScrollItemPattern]::Pattern, [ref]$p)) { try { $p.ScrollIntoView(); Start-Sleep -Milliseconds 300 } catch {} }
+    [RealMouse]::Front([IntPtr]$script:win.Current.NativeWindowHandle)
+    Start-Sleep -Milliseconds 150
+    $pt = New-Object System.Windows.Point
+    if (-not $el.TryGetClickablePoint([ref]$pt)) {
+        $r = $el.Current.BoundingRectangle
+        if ($r.IsEmpty -or $r.Width -le 0) { throw "Elemento non visibile: $($el.Current.Name)" }
+        $pt = New-Object System.Windows.Point ($r.X + $r.Width / 2), ($r.Y + $r.Height / 2)
+    }
+    [RealMouse]::Click([int]$pt.X, [int]$pt.Y)
+    Start-Sleep -Milliseconds 400
+}
+
+# Prova un passo; se qualcosa va storto lo segna come errore e continua con il passo dopo
+function Step($name, [scriptblock]$body) {
+    Log "---- $name"
+    try { & $body } catch { Log "FAIL $name interrotto: $($_.Exception.Message)"; $script:fail++; Shot "errore" ; try { Close-Dialogs } catch {} }
+}
+function Close-Dialogs {
+    foreach ($id in 'DlgResultPrimary', 'DlgSkipLeftovers') {
+        $b = Find-ById $script:win $id
+        if (Visible $b) { Invoke $b; Start-Sleep -Seconds 1 }
+    }
+}
+
 function Invoke($el) {
     if ($el -eq $null) { throw "Elemento non trovato" }
     $p = $null
@@ -61,7 +109,8 @@ function Invoke($el) {
 }
 function Toggle-On($el) {
     $p = $el.GetCurrentPattern([System.Windows.Automation.TogglePattern]::Pattern)
-    if ($p.Current.ToggleState -ne 'On') { $p.Toggle() }
+    if ($p.Current.ToggleState -ne 'On') { Click $el }
+    if ($p.Current.ToggleState -ne 'On') { throw "La casella '$($el.Current.Name)' non si è attivata" }
 }
 function Set-Text($el, $text) {
     $el.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($text)
@@ -132,7 +181,7 @@ function Wait-Dialog-End([int]$seconds = 600) {
 }
 
 function Uninstall-Flow($label) {
-    Invoke (Find-ById $script:win 'DlgConfirmButton')
+    Click (Find-ById $script:win 'DlgConfirmButton')
     Log "Conferma premuta ($label)"
     $state = Wait-Dialog-End 900
     Log "Stato del dialogo: $state"
@@ -147,7 +196,7 @@ function Uninstall-Flow($label) {
                 Log "    [$st] $($i.Current.Name)"
             }
         }
-        Invoke (Find-ById $script:win 'DlgDeleteButton')
+        Click (Find-ById $script:win 'DlgDeleteButton')
         Log "Premuto 'Elimina selezionati'"
         $state = Wait-Dialog-End 300
     }
@@ -159,7 +208,7 @@ function Uninstall-Flow($label) {
         foreach ($t in $texts) { if ($t.Current.Name.Length -gt 2) { Log "    · $($t.Current.Name)" } }
     }
     Shot "$label-risultato"
-    Invoke (Find-ById $script:win 'DlgResultPrimary')
+    Click (Find-ById $script:win 'DlgResultPrimary')
     Start-Sleep -Seconds 2
     return $title
 }
@@ -190,13 +239,14 @@ Log ("Riepilogo: " + (Text-Of $script:win 'AppsSummary'))
 Shot 'elenco-app'
 
 # ---------------------------------------------------------------- 1. VLC da solo
+Step '1. Disinstallo VLC dal suo pulsante' {
 Set-Text (Find-ById $script:win 'SearchBox') 'VLC'
 Start-Sleep -Seconds 2
 Shot 'ricerca-vlc'
 $btn = Wait-For { Find-ByName $script:win 'Disinstalla VLC media player' } 20 'pulsante Disinstalla VLC'
 Check ($btn -ne $null) "Trovo il pulsante Disinstalla di VLC"
 if ($btn) {
-    Invoke $btn
+    Click $btn
     Start-Sleep -Seconds 1
     Shot 'vlc-conferma'
     $vlcDir = (Installed 'VLC*').InstallLocation
@@ -209,7 +259,10 @@ if ($btn) {
 Set-Text (Find-ById $script:win 'SearchBox') ''
 Wait-Apps-Loaded
 
+}
+
 # ---------------------------------------------------------------- 2. più app insieme
+Step '2. Disinstallo 7-Zip e Notepad++ insieme' {
 $sel = 0
 foreach ($n in '7-Zip*', 'Notepad++*') {
     Set-Text (Find-ById $script:win 'SearchBox') $n.TrimEnd('*').Split(' ')[0]
@@ -224,7 +277,7 @@ Check ($sel -eq 2) "Selezionate 2 app con le caselle"
 Shot 'selezione-multipla'
 $multi = Find-ById $script:win 'UninstallSelectedButton'
 if ($multi) {
-    Invoke $multi
+    Click $multi
     Start-Sleep -Seconds 1
     Shot 'multi-conferma'
     Uninstall-Flow 'multi' | Out-Null
@@ -235,10 +288,13 @@ if ($multi) {
 }
 Wait-Apps-Loaded
 
+}
+
 # ---------------------------------------------------------------- 3. Residui e verifica
-Invoke (Find-ById $script:win 'NavLeftovers')
+Step '3. Residui e verifica' {
+Click (Find-ById $script:win 'NavLeftovers')
 Start-Sleep -Seconds 1
-Invoke (Find-ById $script:win 'ScanOrphansButton')
+Click (Find-ById $script:win 'ScanOrphansButton')
 Wait-For { Visible (Find-ById $script:win 'OrphansActionBar') -or (Visible (Find-ById $script:win 'OrphansClean')) } 300 'analisi residui' | Out-Null
 Start-Sleep -Seconds 2
 Shot 'residui'
@@ -248,64 +304,73 @@ if (Visible $selAll) {
     Start-Sleep -Seconds 1
     Log ("Selezione: " + (Text-Of $script:win 'OrphansSelection'))
     Shot 'residui-selezionati'
-    Invoke (Find-ById $script:win 'DeleteOrphansButton')
+    Click (Find-ById $script:win 'DeleteOrphansButton')
     Start-Sleep -Seconds 1
     Shot 'residui-conferma'
-    Invoke (Find-ById $script:win 'DlgResultPrimary')   # "Elimina"
+    Click (Find-ById $script:win 'DlgResultPrimary')   # "Elimina"
     Start-Sleep -Seconds 2
     Wait-For { $t = Text-Of $script:win 'DlgResultTitle'; (Visible (Find-ById $script:win 'DlgResultTitle')) -and $t -notlike 'Eliminare*' } 300 'pulizia residui' | Out-Null
     Log ("Risultato: " + (Text-Of $script:win 'DlgResultTitle'))
     Shot 'residui-risultato'
-    Invoke (Find-ById $script:win 'DlgResultPrimary')
+    Click (Find-ById $script:win 'DlgResultPrimary')
     Start-Sleep -Seconds 3
 }
 foreach ($e in ($ExpectOrphans -split ';' | Where-Object { $_ })) { Check (-not (Test-Path $e)) "Residuo finto eliminato: $e" }
 
+}
+
 # ---------------------------------------------------------------- 4. Ottimizza
+Step '4. Ottimizza e Ripristina' {
 $dvrBefore = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR' -ErrorAction SilentlyContinue).AppCaptureEnabled
 $mouseBefore = (Get-ItemProperty 'HKCU:\Control Panel\Mouse').MouseSpeed
-Invoke (Find-ById $script:win 'NavOptimize')
+Click (Find-ById $script:win 'NavOptimize')
 Wait-For { $t = Text-Of $script:win 'OptimizeScore'; $t -and $t -ne 'Analisi…' } 60 'analisi ottimizzazioni' | Out-Null
 Shot 'ottimizza'
-Invoke (Find-ById $script:win 'OptimizeButton')
+Click (Find-ById $script:win 'OptimizeButton')
 $st = Wait-Dialog-End 300
 Log ("Risultato ottimizzazione: " + (Text-Of $script:win 'DlgResultTitle'))
 Shot 'ottimizza-risultato'
-Invoke (Find-ById $script:win 'DlgResultPrimary')
+Click (Find-ById $script:win 'DlgResultPrimary')
 Check ((Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR').AppCaptureEnabled -eq 0) "Registrazione in background di Game Bar disattivata"
 Check ((Get-ItemProperty 'HKCU:\Control Panel\Mouse').MouseSpeed -eq '0') "Accelerazione del mouse disattivata"
 Check ((powercfg /getactivescheme) -match '8c5e7fda') "Piano energetico Prestazioni elevate attivo"
 Start-Sleep -Seconds 2
-Invoke (Find-ByName $script:win 'Ripristina tutto')
+Click (Find-ByName $script:win 'Ripristina tutto')
 Start-Sleep -Seconds 8
 Shot 'ottimizza-ripristino'
 Check ((Get-ItemProperty 'HKCU:\Control Panel\Mouse').MouseSpeed -eq $mouseBefore) "Mouse ripristinato com'era ($mouseBefore)"
 $dvrAfter = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR' -ErrorAction SilentlyContinue).AppCaptureEnabled
 Check ($dvrAfter -eq $dvrBefore) "Game Bar ripristinata com'era"
 
+}
+
 # ---------------------------------------------------------------- 5. Avvio
-Invoke (Find-ById $script:win 'NavStartup')
+Step '5. App all''avvio' {
+Click (Find-ById $script:win 'NavStartup')
 $sw = Wait-For { Find-ByName $script:win 'Avvio LindoProvaAvvio' } 120 'app di prova all''avvio'
 Shot 'avvio'
 Check ($sw -ne $null) "L'app di prova compare tra le app all'avvio"
 if ($sw) {
-    Invoke $sw
+    Click $sw
     Start-Sleep -Seconds 3
     $v = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run' -ErrorAction SilentlyContinue).LindoProvaAvvio
     Check ($v -and ($v[0] -band 1) -eq 1) "Disattivata come fa Gestione attività (StartupApproved = 03)"
     Check ((Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run').LindoProvaAvvio -ne $null) "La voce originale non è stata cancellata"
     Shot 'avvio-disattivata'
-    Invoke (Find-ByName $script:win 'Avvio LindoProvaAvvio')
+    Click (Find-ByName $script:win 'Avvio LindoProvaAvvio')
     Start-Sleep -Seconds 3
     $v = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run').LindoProvaAvvio
     Check ($v -and ($v[0] -band 1) -eq 0) "Riattivata"
 }
 Remove-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'LindoProvaAvvio' -ErrorAction SilentlyContinue
 
+}
+
 # ---------------------------------------------------------------- 6. Errori e crash
+Step '6. Errori e crash' {
 Start-Process powershell -ArgumentList "-NoProfile -Command [Environment]::FailFast('crash di prova per Lindo')" -Wait -ErrorAction SilentlyContinue
 Start-Sleep -Seconds 8
-Invoke (Find-ById $script:win 'NavCrashes')
+Click (Find-ById $script:win 'NavCrashes')
 Start-Sleep -Seconds 1
 Wait-For { -not (Visible (Find-ById $script:win 'CrashLoading')) } 120 'lettura crash' | Out-Null
 Start-Sleep -Seconds 2
@@ -313,8 +378,10 @@ Shot 'crash'
 $crash = Find-ByName $script:win 'powershell.exe si è chiuso all''improvviso'
 Check ($crash -ne $null) "Il crash provocato compare e viene spiegato"
 
+}
+
 # ---------------------------------------------------------------- verifiche finali
-Invoke (Find-ById $script:win 'NavApps')
+Click (Find-ById $script:win 'NavApps')
 Start-Sleep -Seconds 2
 Shot 'fine'
 $script:proc | Stop-Process -ErrorAction SilentlyContinue
