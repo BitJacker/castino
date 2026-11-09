@@ -805,7 +805,9 @@ namespace Lindo
                 OrphansLoadingText.Text = "Confronto le cartelle di tutti i dischi con le app installate…";
                 var found = await Task.Run(() =>
                 {
-                    var list = CreatePlanner().FindOrphans(all, evidence);
+                    // Anche le voci nascoste (componenti di SDK, runtime…) proteggono le loro cartelle
+                    var owners = all.Concat(AppScanner.ScanDesktop(includeHidden: true)).ToList();
+                    var list = CreatePlanner().FindOrphans(owners, evidence);
                     // Voci "fantasma": app nell'elenco il cui disinstallatore e la cui cartella non esistono più
                     foreach (var a in all.Where(x => x.Source == AppSource.Desktop))
                     {

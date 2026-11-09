@@ -111,7 +111,7 @@ namespace Lindo
                 var ev = EvidenceService.Collect(recentDays);
                 sb.AppendLine("Indizi d'uso: " + ev.InUsePaths.Count);
                 var planner = new LeftoverPlanner(SystemInfo.Roots, new WindowsFileSystem(), new WindowsRegistry());
-                var orphans = planner.FindOrphans(apps, ev);
+                var orphans = planner.FindOrphans(apps.Concat(AppScanner.ScanDesktop(includeHidden: true)).ToList(), ev);
                 var safe = orphans.Where(o => o.Confidence == Confidence.High).ToList();
                 var check = orphans.Where(o => o.Confidence != Confidence.High).ToList();
                 sb.AppendLine("SICURI: " + safe.Count);

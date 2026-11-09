@@ -29,7 +29,12 @@ namespace Lindo.Services
         private static readonly Regex KbRegex = new Regex(@"^(KB|Security Update|Update for|Hotfix)", RegexOptions.IgnoreCase);
         private static readonly Regex GuidRegex = new Regex(@"^\{[0-9A-Fa-f\-]{36}\}$");
 
-        public static List<AppInfo> ScanDesktop()
+        /// <summary>
+        /// Programmi desktop. Con <paramref name="includeHidden"/> include anche le voci nascoste
+        /// (componenti di sistema, aggiornamenti, sotto-componenti di SDK): non si mostrano nell'elenco,
+        /// ma servono a proteggere le loro cartelle nella ricerca dei residui.
+        /// </summary>
+        public static List<AppInfo> ScanDesktop(bool includeHidden = false)
         {
             var list = new List<AppInfo>();
             foreach (var root in UninstallRoots)
@@ -45,7 +50,7 @@ namespace Lindo.Services
                         {
                             using (var k = rk.OpenSubKey(sub))
                             {
-                                var app = Read(k, root + "\\" + sub, sub, root.Contains("WOW6432Node"));
+                                var app = Read(k, root + "\\" + sub, sub, root.Contains("WOW6432Node"), includeHidden);
                                 if (app != null) list.Add(app);
                             }
                         }
@@ -54,6 +59,7 @@ namespace Lindo.Services
                 }
             }
 
+            if (includeHidden) return list;
             // Doppioni (stesso nome e versione): tiene la voce più completa
             return list
                 .GroupBy(a => (a.Name.ToLowerInvariant(), a.Version))
@@ -62,7 +68,7 @@ namespace Lindo.Services
                 .ToList();
         }
 
-        private static AppInfo Read(RegistryKey k, string fullKey, string subName, bool wow)
+        private static AppInfo Read(RegistryKey k, string fullKey, string subName, bool wow, bool includeHidden = false)
         {
             if (k == null) return null;
             string S(string n) { try { return (k.GetValue(n) as string ?? k.GetValue(n)?.ToString() ?? string.Empty).Trim(); } catch { return string.Empty; } }
@@ -70,18 +76,20 @@ namespace Lindo.Services
 
             var name = S("DisplayName");
             if (string.IsNullOrWhiteSpace(name)) return null;
-            if (I("SystemComponent") == 1) return null;
-            if (!string.IsNullOrEmpty(S("ParentKeyName"))) return null;
-            var release = S("ReleaseType");
-            if (release.IndexOf("update", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                release.IndexOf("hotfix", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                release.IndexOf("service pack", StringComparison.OrdinalIgnoreCase) >= 0) return null;
-            if (KbRegex.IsMatch(name)) return null;
-
             var uninstall = S("UninstallString");
             var quiet = S("QuietUninstallString");
             var isMsi = I("WindowsInstaller") == 1;
-            if (string.IsNullOrEmpty(uninstall) && string.IsNullOrEmpty(quiet) && !isMsi) return null;
+            if (!includeHidden)
+            {
+                if (I("SystemComponent") == 1) return null;
+                if (!string.IsNullOrEmpty(S("ParentKeyName"))) return null;
+                var release = S("ReleaseType");
+                if (release.IndexOf("update", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    release.IndexOf("hotfix", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    release.IndexOf("service pack", StringComparison.OrdinalIgnoreCase) >= 0) return null;
+                if (KbRegex.IsMatch(name)) return null;
+                if (string.IsNullOrEmpty(uninstall) && string.IsNullOrEmpty(quiet) && !isMsi) return null;
+            }
 
             DateTime? date = null;
             var ds = S("InstallDate");
